@@ -30,7 +30,9 @@
     h("aside", { class: "cqa-side" },
       h("div", { class: "cqa-logo" }, "CQA"), nav,
       h("label", { class: "cqa-role" }, "Роль", roleSelect),
-      window.CQA_MOCK && h("div", { class: "cqa-demo-note" }, "Демо-режим: диалоги и оценки придуманы, сервер и ИИ не подключены."))
+      window.CQA_MOCK && h("div", { class: "cqa-demo-note" }, window.CQA_DATA
+        ? "Статичная версия: настоящие диалоги DEV и ответы ИИ. Повторная оценка воспроизводит сохранённый ответ модели."
+        : "Демо-режим: диалоги и оценки придуманы, сервер и ИИ не подключены."))
   );
   document.getElementById("cqa-root").append(main);
 

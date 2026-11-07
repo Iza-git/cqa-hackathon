@@ -144,7 +144,9 @@
       } },
   ];
 
-  const db = { conversations: [], checklists: [JSON.parse(JSON.stringify(seed))], evaluations: [], appeals: [], jobs: [], nextId: 1 };
+  const real = window.CQA_DATA;  // встроено сборкой results/build_site.py: настоящие диалоги и ответы ИИ
+  const source = real ? real.conversations : base;
+  const db = { conversations: [], checklists: [JSON.parse(JSON.stringify(real ? real.checklist : seed))], evaluations: [], appeals: [], jobs: [], nextId: 1 };
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const fail = (message) => { throw new Error(message); };
   const round2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
@@ -249,6 +251,7 @@
       return;
     }
     ev.results = cl.criteria.map((k) => scriptedResult(c, k));
+    if (c.model) ev.model = c.model;
     const { calc } = recalc(ev, "ai_answer");
     Object.assign(ev, { status: "done", error: null, ai_total: calc.total, ai_critical_flag: calc.critical_flag });
     applyFinal(ev);
@@ -365,13 +368,13 @@
     return URL.createObjectURL(new Blob([buf], { type: "audio/wav" }));
   }
 
-  importGroup("DEV", base);
+  importGroup("DEV", source);
   db.conversations.forEach((c) => runEvaluation(makeEvaluation(c, db.checklists[0])));
 
   const routes = [
     ["POST", /^\/datasets\/import$/, (_, b) => {
       const g = (b.group_id || "").trim() || fail("Укажите group_id");
-      const list = g === "DEV" ? base : base.slice(0, 3).map((x) => ({ ...x, conversation_id: x.conversation_id.replace("demo", g.toLowerCase()) }));
+      const list = g === "DEV" ? source : source.slice(0, 3).map((x) => ({ ...x, conversation_id: x.conversation_id.replace("demo", g.toLowerCase()) }));
       const n = importGroup(g, list);
       return { imported: n, total: n };
     }],

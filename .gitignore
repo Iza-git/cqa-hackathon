@@ -6,3 +6,5 @@ research/dialogs/
 .claude/
 graphify-out/cache/
 graphify-out/.graphify_*
+results/cqa_site.html
+results/*.csv
