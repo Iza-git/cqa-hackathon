@@ -1,0 +1,8 @@
+.env
+*.db
+__pycache__/
+data/*.json
+research/dialogs/
+.claude/
+graphify-out/cache/
+graphify-out/.graphify_*

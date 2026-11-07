@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Freedom CQA</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 34'%3E%3Cpath d='M15 1 28 5.5V17c0 8-6 13.5-13 16C8 30.5 2 25 2 17V5.5z' fill='%231fd36b'/%3E%3Cpath d='M10 9h11v3.6h-7.2v2.6H20v3.5h-6.2V26H10z' fill='%2304140c'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="cqa.css">
+</head>
+<body style="background:#07090a">
+  <!-- Компонент самодостаточен: для Dynamics 365 достаточно этого div, cqa.css и cqa.js.
+       data-api — адрес сервиса оценки (пусто = тот же origin). -->
+  <div id="cqa-app" class="cqa" data-api=""></div>
+  <script src="cqa.js"></script>
+</body>
+</html>

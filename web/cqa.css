@@ -1,0 +1,353 @@
+/* CQA — рабочее место контроля качества. Все стили изолированы классом .cqa */
+.cqa {
+  /* Фирменный стиль Freedom: чёрный фон, неоново-зелёный акцент, стеклянные карточки */
+  --bg: #07090a;
+  --bg-2: #0d1210;
+  --panel: rgba(255,255,255,.035);
+  --panel-2: rgba(255,255,255,.055);
+  --field: #111715;
+  --ink: #f3f6f4;
+  --ink-2: #c9d3cd;
+  --muted: #8a968f;
+  --line: rgba(255,255,255,.08);
+  --line-2: rgba(255,255,255,.16);
+
+  --brand: #04140c;
+  --olive: #1fd36b;          /* фирменный зелёный Freedom — основная кнопка */
+  --olive-2: #16b85a;
+  --on-accent: #04140c;
+  --green: #1fd36b;          /* «выполнено» */
+  --green-soft: rgba(31,211,107,.14);
+  --lime: #7dffb4;
+  --bad: #ff5c5c;
+  --bad-soft: rgba(255,92,92,.14);
+  --warn: #ffc24b;
+  --warn-soft: rgba(255,194,75,.14);
+  --na: #9aa7b4;
+  --na-soft: rgba(154,167,180,.14);
+  --cream: rgba(31,211,107,.13);   /* подсветка фрагмента */
+  --cream-2: rgba(31,211,107,.55);
+  --range: rgba(255,255,255,.04);
+
+  --r: 18px;
+  --shadow: 0 10px 40px rgba(0,0,0,.35);
+  font: 14px/1.5 "Manrope", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  color-scheme: dark;
+  background:
+    radial-gradient(900px 520px at 88% -8%, rgba(31,211,107,.22) 0%, transparent 60%),
+    radial-gradient(700px 500px at 30% 120%, rgba(31,211,107,.10) 0%, transparent 60%),
+    var(--bg);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+}
+.cqa * { box-sizing: border-box; }
+body { margin: 0; background: #07090a; }
+.cqa button, .cqa input, .cqa select, .cqa textarea { font: inherit; color: inherit; }
+.cqa a { color: var(--olive); }
+.cqa svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- сайдбар ---------- */
+.cqa-side {
+  position: sticky; top: 0; height: 100vh; padding: 22px 14px;
+  background:
+    repeating-linear-gradient(90deg, rgba(31,211,107,.0) 0 7px, rgba(31,211,107,.07) 7px 8px) right bottom / 120px 55% no-repeat,
+    radial-gradient(260px 340px at 100% 100%, rgba(31,211,107,.28), transparent 70%),
+    #030504;
+  border-right: 1px solid var(--line);
+  color: #e9efe3; display: flex; flex-direction: column; gap: 6px;
+}
+.cqa-logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 22px; }
+.cqa-logo svg { width: 30px; height: 34px; flex: none; }
+.cqa-logo .wm { font-weight: 800; font-size: 19px; letter-spacing: 1.5px; color: #fff; line-height: 1; }
+.cqa-logo .tag { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 800; letter-spacing: .6px; color: var(--on-accent); background: var(--olive); border-radius: 6px; padding: 2px 6px; }
+.cqa-nav { display: flex; flex-direction: column; gap: 4px; }
+.cqa-nav a { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 999px; color: #b9c4bd; text-decoration: none; font-weight: 700; border: 1px solid transparent; }
+.cqa-nav a:hover { background: rgba(255,255,255,.05); color: #fff; }
+.cqa-nav a.on { background: rgba(31,211,107,.12); border-color: rgba(31,211,107,.45); color: var(--lime); box-shadow: 0 0 24px rgba(31,211,107,.18); }
+.cqa-nav .cnt { margin-left: auto; background: var(--olive); color: var(--on-accent); border-radius: 10px; padding: 0 7px; font-size: 12px; font-weight: 800; }
+.cqa-side-foot { margin-top: auto; font-size: 12px; color: #9aa69f; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.03); line-height: 1.6; backdrop-filter: blur(6px); }
+.cqa-side-foot b { color: #fff; }
+.cqa-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--lime); margin-right: 6px; vertical-align: 1px; }
+.cqa-dot.off { background: #e0a13a; }
+
+/* ---------- контент ---------- */
+.cqa-main { padding: 28px 32px 48px; max-width: 1480px; width: 100%; }
+.cqa h1 { font-size: 30px; line-height: 1.15; margin: 0; font-weight: 800; letter-spacing: -.3px; }
+.cqa h2 { font-size: 19px; margin: 0; font-weight: 800; }
+.cqa h3 { font-size: 14px; margin: 0; font-weight: 800; }
+.cqa .sub { color: var(--muted); margin: 6px 0 0; font-weight: 600; }
+.cqa .head { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+.cqa .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; box-shadow: var(--shadow); }
+.cqa .panel-h { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+.cqa .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.cqa .grow { flex: 1; }
+.cqa .muted { color: var(--muted); }
+.cqa .small { font-size: 12px; }
+.cqa .sep { color: var(--line-2); margin: 0 6px; }
+
+.cqa .btn { display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line-2); background: rgba(255,255,255,.04); padding: 8px 14px; border-radius: 10px; cursor: pointer; white-space: nowrap; font-weight: 700; text-decoration: none; color: var(--ink); }
+.cqa .btn:hover { border-color: var(--olive); }
+.cqa .btn.pri { background: var(--olive); border-color: var(--olive); color: var(--on-accent); box-shadow: 0 6px 24px rgba(31,211,107,.35); }
+.cqa .btn.pri:hover { background: var(--olive-2); border-color: var(--olive-2); }
+.cqa .btn.ghost { border-color: transparent; background: transparent; }
+.cqa .btn.danger { color: var(--bad); }
+.cqa .btn.sm { padding: 4px 10px; font-size: 12px; border-radius: 8px; }
+.cqa .btn:disabled { opacity: .5; cursor: default; box-shadow: none; }
+.cqa input[type=text], .cqa input[type=number], .cqa input:not([type]), .cqa select, .cqa textarea {
+  border: 1.5px solid var(--line-2); border-radius: 10px; padding: 7px 10px; background: var(--field); min-width: 0; outline: none; }
+.cqa input:focus, .cqa select:focus, .cqa textarea:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(31,211,107,.18); }
+.cqa textarea { width: 100%; resize: vertical; min-height: 64px; }
+.cqa label.f { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 700; }
+.cqa label.f > * { font-size: 14px; color: var(--ink); font-weight: 500; }
+
+/* ---------- KPI ---------- */
+.cqa .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.cqa .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; box-shadow: var(--shadow); }
+.cqa .kpi .l { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.cqa .kpi .v { font-size: 30px; font-weight: 800; line-height: 1.2; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.cqa .kpi .h { font-size: 12px; color: var(--muted); }
+
+/* ---------- список ---------- */
+.cqa .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.cqa .seg { display: inline-flex; background: var(--field); border: 1.5px solid var(--line-2); border-radius: 10px; padding: 2px; }
+.cqa .seg button { border: 0; background: none; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-weight: 700; color: var(--muted); }
+.cqa .seg button.on { background: var(--olive); color: var(--on-accent); }
+.cqa table.list { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+.cqa table.list th { text-align: left; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); background: var(--panel-2); padding: 11px 14px; border-bottom: 1px solid var(--line); }
+.cqa table.list td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.cqa table.list tr:last-child td { border-bottom: 0; }
+.cqa table.list tr.click { cursor: pointer; }
+.cqa table.list tr.click:hover td { background: rgba(31,211,107,.06); }
+.cqa .ch { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.cqa .mini-bar { display: flex; align-items: center; gap: 10px; }
+.cqa .mini-bar .track { width: 90px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.cqa .mini-bar .fill { height: 100%; border-radius: 3px; }
+
+.cqa .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; background: var(--na-soft); color: var(--na); white-space: nowrap; }
+.cqa .chip.yes { background: var(--green-soft); color: var(--green); }
+.cqa .chip.no { background: var(--bad-soft); color: var(--bad); }
+.cqa .chip.warn { background: var(--warn-soft); color: var(--warn); }
+.cqa .chip.na { background: var(--na-soft); color: var(--na); }
+.cqa .score { font-weight: 800; font-variant-numeric: tabular-nums; }
+.cqa .c-hi { color: var(--green); } .cqa .c-mid { color: var(--warn); } .cqa .c-lo { color: var(--bad); }
+.cqa .b-hi { background: var(--green); } .cqa .b-mid { background: var(--warn); } .cqa .b-lo { background: var(--bad); }
+.cqa s.old { color: var(--muted); font-weight: 600; margin-right: 6px; }
+
+/* ---------- анализ разговора ---------- */
+.cqa .wave-panel { padding: 16px 20px 14px; margin-bottom: 16px; }
+.cqa .lanes { display: grid; grid-template-columns: 92px minmax(0, 1fr); row-gap: 6px; align-items: center; }
+.cqa .lane-l { font-weight: 800; font-size: 13px; color: var(--ink-2); }
+.cqa .lane { position: relative; height: 46px; cursor: pointer; }
+.cqa .lane svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cqa .lane .base { stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 2 3; }
+.cqa .lane.client rect { fill: #e8efe9; }
+.cqa .lane.operator rect { fill: var(--green); }
+.cqa .lane.bot rect { fill: #4b5650; }
+.cqa .lane rect.past { opacity: 1; } .cqa .lane rect.future { opacity: .45; }
+.cqa .wave-sel { position: absolute; top: 0; bottom: 0; background: rgba(31,211,107,.14); border-left: 2px solid var(--cream-2); border-right: 2px solid var(--cream-2); pointer-events: none; transition: left .25s, width .25s; border-radius: 3px; }
+.cqa .wave-mark { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--bad); opacity: .6; pointer-events: none; }
+.cqa .player { display: flex; align-items: center; gap: 14px; margin-top: 12px; padding-left: 92px; }
+.cqa .play { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--olive); color: var(--on-accent); display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 12px rgba(31,211,107,.45); flex: none; }
+.cqa .play:hover { background: var(--olive-2); }
+.cqa .play svg { width: 16px; height: 16px; fill: currentColor; stroke: none; }
+.cqa .time { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink-2); min-width: 104px; }
+.cqa .scrub { position: relative; flex: 1; height: 22px; cursor: pointer; }
+.cqa .scrub .t { position: absolute; left: 0; right: 0; top: 9px; height: 4px; border-radius: 2px; background: var(--line-2); }
+.cqa .scrub .p { position: absolute; left: 0; top: 9px; height: 4px; border-radius: 2px; background: var(--green); }
+.cqa .scrub .k { position: absolute; top: 4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--green); border: 3px solid #07090a; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+.cqa .speed { border: 1.5px solid var(--line-2); background: var(--field); border-radius: 8px; padding: 3px 8px; font-weight: 800; font-size: 12px; cursor: pointer; }
+
+.cqa .work { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 16px; align-items: start; }
+.cqa .transcript { max-height: calc(100vh - 360px); min-height: 360px; overflow: auto; margin: 0 -8px; padding: 4px 8px; scroll-behavior: smooth; }
+.cqa .msg { padding: 10px 12px; border-radius: 12px; margin: 2px 0; border-bottom: 1px solid var(--line); scroll-margin: 80px; transition: background .25s; cursor: pointer; position: relative; }
+.cqa .msg:hover { background: var(--panel-2); }
+.cqa .msg .meta { display: flex; gap: 10px; align-items: baseline; font-size: 13px; }
+.cqa .msg .ts { color: var(--muted); font-variant-numeric: tabular-nums; font-weight: 600; }
+.cqa .msg .who { font-weight: 800; color: var(--ink-2); }
+.cqa .msg .n { margin-left: auto; color: var(--line-2); font-size: 11px; font-weight: 800; }
+.cqa .msg .txt { margin-top: 3px; color: var(--ink); }
+.cqa .msg.operator .who { color: var(--green); }
+.cqa .msg.bot, .cqa .msg.system { opacity: .55; }
+.cqa .msg.system .txt { font-style: italic; font-size: 13px; }
+.cqa .msg.inrange { background: var(--range); }
+.cqa .msg.now { box-shadow: inset 3px 0 0 var(--green); }
+.cqa .msg.hl { background: var(--cream) !important; opacity: 1; border-bottom-color: transparent; box-shadow: 0 2px 10px rgba(31,211,107,.18); outline: 1px solid rgba(31,211,107,.4); }
+
+/* оценка качества */
+.cqa .qa-top { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; align-items: center; padding: 6px 0 14px; border-bottom: 1px solid var(--line); }
+.cqa .ring { position: relative; width: 150px; height: 150px; }
+.cqa .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.cqa .ring .bgc { stroke: var(--line); }
+.cqa .ring .fg { transition: stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1); }
+.cqa .ring .c { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.cqa .ring .v { font-size: 36px; font-weight: 800; line-height: 1; letter-spacing: -.5px; }
+.cqa .ring .m { color: var(--muted); font-weight: 700; margin-top: 4px; }
+.cqa .ring .o { font-size: 13px; color: var(--muted); text-decoration: line-through; font-weight: 700; }
+.cqa .clist { display: flex; flex-direction: column; gap: 2px; }
+.cqa .citem { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; border-radius: 9px; cursor: pointer; border: 0; background: none; text-align: left; width: 100%; }
+.cqa .citem:hover, .cqa .citem.on { background: var(--panel-2); }
+.cqa .citem .nm { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cqa .citem .pt { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cqa .citem .pt small { color: var(--muted); font-weight: 700; font-size: 13px; }
+.cqa .ic { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; }
+.cqa .ic svg { width: 14px; height: 14px; stroke-width: 3; }
+.cqa .ic.yes { background: var(--green-soft); color: var(--green); }
+.cqa .ic.part { background: var(--warn-soft); color: var(--warn); }
+.cqa .ic.no { background: var(--bad-soft); color: var(--bad); }
+.cqa .ic.na { background: var(--na-soft); color: var(--na); font-size: 9px; font-weight: 800; }
+.cqa .gross-bar { display: flex; align-items: center; gap: 10px; background: var(--bad); color: #fff; padding: 10px 14px; border-radius: 12px; font-weight: 800; margin: 12px 0 0; }
+.cqa .why { padding: 14px 0 4px; }
+.cqa .why h3 { margin-bottom: 6px; }
+.cqa .why ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.cqa .why li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; color: var(--ink-2); }
+.cqa .why li b { color: var(--bad); font-variant-numeric: tabular-nums; }
+.cqa .actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.cqa .actions .btn { flex: 1; justify-content: center; padding: 11px 14px; }
+
+.cqa .detail { margin-top: 14px; border: 1.5px solid var(--line); border-radius: 12px; padding: 14px; background: var(--panel-2); }
+.cqa .detail.changed { border-color: var(--warn); }
+.cqa .detail .dh { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.cqa .detail .code { color: var(--olive-2); font-weight: 800; }
+.cqa .detail .rule { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.cqa .detail .expl { margin: 8px 0; }
+.cqa .ev { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; }
+.cqa .ev button { border: 1.5px solid var(--cream-2); background: var(--cream); border-radius: 8px; padding: 2px 9px; cursor: pointer; font-size: 12px; font-weight: 700; }
+.cqa .ev button:hover { background: var(--cream-2); }
+.cqa .note { font-size: 13px; padding: 8px 11px; border-radius: 10px; margin-top: 8px; background: var(--panel-2); border: 1px solid var(--line); }
+.cqa .note.warn { background: var(--warn-soft); border-color: transparent; }
+.cqa .note.appeal { background: rgba(150,120,255,.12); border-color: transparent; }
+.cqa .facts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.cqa .fact { font-size: 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; color: var(--ink-2); font-weight: 600; }
+.cqa .fact b { font-variant-numeric: tabular-nums; }
+.cqa .fact.bad { background: var(--bad-soft); border-color: transparent; color: var(--bad); }
+.cqa .evbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+
+/* ---------- аналитика ---------- */
+.cqa .grid2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.cqa .hbar { display: grid; grid-template-columns: 30px minmax(0, 1fr) 160px 60px; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.cqa .hbar:last-child { border-bottom: 0; }
+.cqa .hbar .track { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+.cqa .hbar .fill { height: 100%; border-radius: 5px; transition: width .6s; }
+.cqa .hist { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding-top: 10px; }
+.cqa .hist div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; font-size: 11px; color: var(--muted); font-weight: 700; }
+.cqa .hist .col { width: 100%; border-radius: 6px 6px 2px 2px; min-height: 2px; }
+
+/* ---------- чек-лист ---------- */
+.cqa .ed { display: grid; gap: 12px; }
+.cqa .ed-c { border: 1px solid var(--line); border-radius: var(--r); padding: 16px; background: var(--panel); display: grid; gap: 10px; box-shadow: var(--shadow); }
+.cqa .ed-grid { display: grid; grid-template-columns: 70px 1fr 190px 150px 90px; gap: 10px; }
+.cqa .scale-row { display: grid; grid-template-columns: 80px 1fr auto; gap: 6px; }
+.cqa .wsum { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 8px; }
+.cqa .wsum div { height: 100%; }
+
+/* ---------- общее ---------- */
+.cqa .toast { position: fixed; right: 18px; bottom: 18px; background: var(--olive); color: var(--on-accent); padding: 12px 16px; border-radius: 12px; z-index: 20; max-width: 440px; box-shadow: 0 10px 30px rgba(0,0,0,.25); font-weight: 600; animation: cqa-in .25s ease-out; }
+.cqa .toast.err { background: var(--bad); }
+@keyframes cqa-in { from { transform: translateY(10px); opacity: 0; } }
+.cqa .progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; width: 180px; }
+.cqa .progress div { height: 100%; background: var(--green); transition: width .4s; }
+.cqa .empty { padding: 48px 20px; text-align: center; color: var(--muted); font-weight: 600; }
+.cqa .spin { display: inline-block; width: 13px; height: 13px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: cqa-spin .7s linear infinite; vertical-align: -2px; }
+@keyframes cqa-spin { to { transform: rotate(360deg); } }
+.cqa .disclaimer { margin-top: 26px; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 1100px) {
+  .cqa .work, .cqa .grid2 { grid-template-columns: 1fr; }
+  .cqa .transcript { max-height: 460px; }
+  .cqa .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .cqa { grid-template-columns: 1fr; }
+  .cqa-side { position: sticky; z-index: 5; height: auto; flex-direction: row; align-items: center; padding: 10px 12px; }
+  .cqa-logo { padding: 0; font-size: 18px; }
+  .cqa-nav { flex-direction: row; overflow-x: auto; }
+  .cqa-nav a span.t { display: none; }
+  .cqa-side-foot { display: none; }
+  .cqa-main { padding: 16px; }
+  .cqa .ed-grid { grid-template-columns: 1fr 1fr; }
+  .cqa .qa-top { grid-template-columns: 1fr; justify-items: center; }
+  .cqa .lanes { grid-template-columns: 64px minmax(0, 1fr); }
+  .cqa .player { padding-left: 0; }
+  .cqa .hbar { grid-template-columns: 28px minmax(0, 1fr) 70px 46px; }
+}
+
+/* ---------- фирменные детали Freedom ---------- */
+.cqa .panel, .cqa .kpi, .cqa table.list, .cqa .ed-c { backdrop-filter: blur(10px); }
+.cqa .kpi { position: relative; overflow: hidden; }
+.cqa .kpi::after { content: ""; position: absolute; right: -40px; top: -40px; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(rgba(31,211,107,.18), transparent 70%); }
+.cqa h1 { background: linear-gradient(90deg, #ffffff 0%, #c9ffe0 60%, var(--olive) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cqa .wave-panel { background: linear-gradient(180deg, rgba(31,211,107,.06), rgba(255,255,255,.02)); border-color: rgba(31,211,107,.18); }
+.cqa .lane.operator rect { fill: var(--olive); filter: drop-shadow(0 0 3px rgba(31,211,107,.6)); }
+.cqa .msg { border-bottom-color: rgba(255,255,255,.05); }
+.cqa .msg.operator .who { color: var(--olive); }
+.cqa .msg.client .who { color: #ffffff; }
+.cqa .btn.ghost:hover { background: rgba(255,255,255,.05); }
+.cqa select option { background: #111715; color: #f3f6f4; }
+.cqa table.list th { background: rgba(255,255,255,.03); }
+.cqa .ring .fg { filter: drop-shadow(0 0 6px rgba(31,211,107,.45)); }
+.cqa .gross-bar { box-shadow: 0 0 24px rgba(255,92,92,.3); }
+.cqa ::-webkit-scrollbar { width: 8px; height: 8px; }
+.cqa ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
+.cqa ::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- полировка (make-interfaces-feel-better) ---------- */
+.cqa { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+.cqa h1, .cqa h2, .cqa h3 { text-wrap: balance; }
+.cqa p, .cqa .txt, .cqa .expl, .cqa .why li { text-wrap: pretty; }
+.cqa .ring .v, .cqa .citem .pt, .cqa .chip, .cqa .msg .ts, .cqa .hist div, .cqa .fact b { font-variant-numeric: tabular-nums; }
+
+/* иконки: обводка под вес текста 700 */
+.cqa svg.i { stroke-width: 2; }
+.cqa .ic svg { stroke-width: 2.5; }
+/* треугольник «play» визуально смещён влево — выравниваем оптически */
+.cqa .play svg { transform: translateX(1.5px); }
+.cqa .play.on svg { transform: none; }
+
+/* отклик на нажатие и прерываемые переходы только нужных свойств */
+.cqa .btn, .cqa .play, .cqa .speed, .cqa .citem, .cqa .ev button, .cqa .seg button, .cqa .cqa-nav a {
+  transition-property: background-color, border-color, color, box-shadow, scale;
+  transition-duration: 150ms; transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+}
+.cqa .btn:active:not(:disabled), .cqa .play:active, .cqa .speed:active, .cqa .ev button:active, .cqa .seg button:active { scale: .96; }
+
+/* минимальная зона клика 40×40 для мелких контролов в плотном интерфейсе */
+.cqa .ev button, .cqa .btn.sm, .cqa .speed { position: relative; }
+.cqa .ev button::after, .cqa .btn.sm::after, .cqa .speed::after { content: ""; position: absolute; inset: -10px -4px; }
+
+/* видимый фокус для клавиатуры */
+.cqa :is(a, button, select, input, textarea, [data-crit]):focus-visible { outline: 2px solid var(--olive); outline-offset: 2px; }
+
+/* концентрические радиусы: внутренние поверхности = внешний радиус − отступ */
+.cqa .detail { border-radius: 14px; }
+.cqa .detail .ev button, .cqa .detail .note { border-radius: 8px; }
+.cqa .wave-panel .lane .wave-sel { border-radius: 4px; }
+
+/* мягкий уход уведомления */
+.cqa .toast { transition-property: opacity, translate; transition-duration: 200ms; transition-timing-function: ease-out; }
+.cqa .toast.out { opacity: 0; translate: 0 6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cqa *, .cqa *::before, .cqa *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- уникальные функции: уверенность, цитата, коучинг, горячие клавиши ---------- */
+.cqa .citem .low { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--warn-soft); color: var(--warn); font-size: 11px; font-weight: 800; vertical-align: 1px; }
+.cqa .quote { margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--olive); background: rgba(31,211,107,.06); border-radius: 0 8px 8px 0; font-style: italic; color: var(--ink-2); }
+.cqa .conf { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin: 8px 0; font-weight: 700; }
+.cqa .conf .track { width: 120px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.cqa .conf .track div { height: 100%; background: var(--green); }
+.cqa .conf.low .track div { background: var(--warn); }
+.cqa .conf b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.cqa .coach { margin: 10px 0; padding: 10px 12px; border-radius: 10px; background: linear-gradient(90deg, rgba(31,211,107,.12), rgba(31,211,107,.03)); border: 1px solid rgba(31,211,107,.3); }
+.cqa .coach b { display: flex; align-items: center; gap: 6px; color: var(--lime); font-size: 12px; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+.cqa .coach svg.i { width: 14px; height: 14px; }
+.cqa .msg mark { background: rgba(31,211,107,.35); color: #fff; border-radius: 4px; padding: 0 2px; box-shadow: 0 0 0 1px rgba(31,211,107,.6); }
+.cqa .help-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 30; padding: 16px; }
+.cqa .help-overlay .panel { width: min(560px, 100%); background: #0d1210; }
+.cqa .help-row { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.cqa .help-row:last-child { border-bottom: 0; }
+.cqa kbd { display: inline-block; min-width: 22px; text-align: center; padding: 1px 6px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line-2); border-bottom-width: 2px; font: 700 12px/1.6 ui-monospace, monospace; color: var(--ink); }
+.cqa .kbd-hint { position: fixed; left: 248px; bottom: 14px; font-size: 12px; color: var(--muted); }
+@media (max-width: 760px) { .cqa .kbd-hint { display: none; } }
