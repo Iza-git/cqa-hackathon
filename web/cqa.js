@@ -20,7 +20,8 @@
     back: '<path d="M15 18l-6-6 6-6"/>', ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
     play: '<path d="M7 4.5v15l13-7.5z"/>', pause: '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>',
     target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>', flag: '<path d="M5 21V4h11l-2 4 2 4H5"/>',
-    dl: '<path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/>', bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+    dl: '<path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/>', next: '<path d="m9 6 6 6-6 6"/>', down: '<path d="m6 9 6 6 6-6"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>', bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
   };
   const ic = (n, cls = "i") => `<svg class="${cls}" viewBox="0 0 24 24">${I[n]}</svg>`;
 
@@ -89,10 +90,12 @@
           <div><div class="wm">FREEDOM</div><span class="tag">CQA · КАЧЕСТВО</span></div>
         </div>
         <nav class="cqa-nav">
+          <span class="nav-l">Работа</span>
           <a href="#/dialogs" data-nav="dialogs">${ic("chat")}<span class="t">Диалоги</span></a>
-          <a href="#/checklist" data-nav="checklist">${ic("check")}<span class="t">Чек-листы</span></a>
           <a href="#/appeals" data-nav="appeals">${ic("scale")}<span class="t">Апелляции</span><span class="cnt" id="cqa-appeal-cnt" hidden></span></a>
           <a href="#/analytics" data-nav="analytics">${ic("chart")}<span class="t">Аналитика</span></a>
+          <span class="nav-l">Настройка</span>
+          <a href="#/checklist" data-nav="checklist">${ic("check")}<span class="t">Чек-лист</span></a>
         </nav>
         <div class="cqa-side-foot" id="cqa-status"></div>
       </aside>
@@ -123,64 +126,82 @@
     window.scrollTo(0, 0);
   }
 
+  // ---------- общие блоки страницы ----------
+  const pageHead = (title, sub, actions = "") => `
+    <header class="page-head"><div><h1>${title}</h1>${sub ? `<p class="sub">${sub}</p>` : ""}</div><div class="page-actions">${actions}</div></header>`;
+
+  function statusOf(d) {
+    const e = d.evaluation;
+    if (!e) return { k: "todo", cls: "", label: "Не оценён" };
+    if (e.gross_violation) return { k: "gross", cls: "no", label: "Грубая ошибка" };
+    if (e.open_appeals) return { k: "appeal", cls: "warn", label: "Апелляция" };
+    if (e.low_confidence) return { k: "review", cls: "info", label: "Проверить" };
+    return { k: "ok", cls: "yes", label: "Готово" };
+  }
+
   // ---------- диалоги ----------
   async function viewDialogs(v) {
     const f = state.filters;
     const [dialogs, groups] = await Promise.all([api("/dialogs" + (f.group ? "?group_id=" + encodeURIComponent(f.group) : "")), api("/groups")]);
-    const ev = dialogs.filter((d) => d.evaluation);
-    const avg = ev.length ? ev.reduce((s, d) => s + (d.evaluation.total || 0), 0) / ev.length : null;
-    const openAp = ev.reduce((s, d) => s + d.evaluation.open_appeals, 0);
-    v.innerHTML = `
-      <div class="head"><div class="grow"><h1>Диалоги</h1><p class="sub">Чаты и звонки операторов · ${groups.map((g) => `${esc(g.group_id)}: ${g.n}`).join(" · ") || "нет данных"}</p></div>
-        <a class="btn" href="${API}/api/export.csv${f.group ? "?group_id=" + encodeURIComponent(f.group) : ""}">${ic("dl")} Экспорт CSV</a>
-        <button class="btn pri" id="batch-btn">${ic("bolt")} Оценить неоценённые</button></div>
-      <div class="kpis">
-        <div class="kpi"><div class="l">Оценено</div><div class="v">${ev.length}<span class="muted" style="font-size:18px"> / ${dialogs.length}</span></div><div class="h">диалогов в выборке</div></div>
-        <div class="kpi"><div class="l">Средний балл</div><div class="v c-${tone(avg)}">${num(avg)}</div><div class="h">из 100 после апелляций</div></div>
-        <div class="kpi"><div class="l">Грубые ошибки</div><div class="v ${ev.some((d) => d.evaluation.gross_violation) ? "c-lo" : ""}">${ev.filter((d) => d.evaluation.gross_violation).length}</div><div class="h">отмечаются отдельно от балла</div></div>
-        <div class="kpi"><div class="l">Апелляции</div><div class="v">${openAp}</div><div class="h">ожидают решения</div></div>
-      </div>
-      <div class="toolbar">
-        <input id="f-q" placeholder="Поиск по ID" value="${esc(f.q)}" style="width:170px">
-        <div class="seg" id="f-lang">${["", "RU", "KZ", "EN"].map((l) => `<button data-v="${l}" class="${l === f.lang ? "on" : ""}">${l || "Все языки"}</button>`).join("")}</div>
-        <div class="seg" id="f-ch">${[["", "Все"], ["agent chat", "Чаты"], ["voice call", "Звонки"]].map(([k, l]) => `<button data-v="${k}" class="${k === f.ch ? "on" : ""}">${l}</button>`).join("")}</div>
-        <div class="seg" id="f-st">${[["", "Все"], ["todo", "Не оценены"], ["review", "Проверить"], ["gross", "Грубые"], ["appeal", "С апелляцией"]].map(([k, l]) => `<button data-v="${k}" class="${k === f.status ? "on" : ""}">${l}</button>`).join("")}</div>
-        <span class="grow"></span>
-        <select id="f-group"><option value="">Все наборы</option>${groups.map((g) => `<option ${g.group_id === f.group ? "selected" : ""}>${esc(g.group_id)}</option>`).join("")}</select>
-        <input id="load-group" placeholder="group_id" style="width:110px"><button class="btn" id="load-btn">Загрузить набор</button>
+    const evald = dialogs.filter((d) => d.evaluation);
+    const avg = evald.length ? evald.reduce((s, d) => s + (d.evaluation.total || 0), 0) / evald.length : null;
+    const count = (k) => dialogs.filter((d) => statusOf(d).k === k).length;
+    const stat = (k, label, value, hint, cls = "") => `
+      <button class="stat ${k && f.status === k ? "on" : ""} ${cls}" data-st="${k}"><span class="l">${label}</span><span class="v">${value}</span><span class="h">${hint}</span></button>`;
+
+    v.innerHTML = pageHead("Диалоги", `${dialogs.length} чатов и звонков · набор ${groups.map((g) => esc(g.group_id)).join(", ") || "не загружен"}`, `
+        <details class="pop"><summary class="btn">${ic("dl")} Данные</summary>
+          <div class="pop-body">
+            <label class="f">Загрузить набор по group_id<span class="row"><input id="load-group" placeholder="например, DEV"><button class="btn" id="load-btn">Загрузить</button></span></label>
+            <label class="f">Показывать набор<select id="f-group"><option value="">Все наборы</option>${groups.map((g) => `<option ${g.group_id === f.group ? "selected" : ""}>${esc(g.group_id)} · ${g.n}</option>`).join("")}</select></label>
+            <a class="btn" href="${API}/api/export.csv${f.group ? "?group_id=" + encodeURIComponent(f.group) : ""}">${ic("dl")} Скачать результаты CSV</a>
+          </div></details>
+        <button class="btn pri" id="batch-btn">${ic("bolt")} Оценить все неоценённые</button>`) + `
+      ${evald.length ? "" : `<div class="guide">${ic("bolt")}<div><b>С чего начать.</b> Нажмите «Оценить все неоценённые» — модель проверит каждый диалог по чек-листу.
+        Затем откройте диалог, чтобы увидеть баллы, доказательства и оспорить оценку.</div></div>`}
+      <div class="stats">
+        ${stat("todo", "Не оценены", count("todo"), "ждут оценки")}
+        ${stat("", "Средний балл", `<span class="c-${tone(avg)}">${num(avg)}</span>`, `${evald.length} оценено · все диалоги`)}
+        ${stat("review", "Проверить", count("review"), "модель не уверена", "info")}
+        ${stat("gross", "Грубые ошибки", count("gross"), "отдельно от балла", count("gross") ? "bad" : "")}
       </div>
       <div id="job-box"></div>
-      <table class="list"><thead><tr><th>Диалог</th><th>Канал</th><th>Язык</th><th>Реплик</th><th>Итоговый балл</th><th>Грубые ошибки</th><th>Апелляции</th></tr></thead><tbody id="rows"></tbody></table>`;
+      <div class="toolbar">
+        <label class="search">${ic("search")}<input id="f-q" placeholder="Поиск по ID диалога" value="${esc(f.q)}"><kbd>/</kbd></label>
+        <div class="seg" id="f-lang">${["", "RU", "KZ", "EN"].map((l) => `<button data-v="${l}" class="${l === f.lang ? "on" : ""}">${l || "Все языки"}</button>`).join("")}</div>
+        <div class="seg" id="f-ch">${[["", "Все каналы"], ["agent chat", "Чаты"], ["voice call", "Звонки"]].map(([k, l]) => `<button data-v="${k}" class="${k === f.ch ? "on" : ""}">${l}</button>`).join("")}</div>
+        ${f.status ? `<button class="btn sm ghost" id="f-reset">${ic("x")} Сбросить фильтр «${esc({ todo: "Не оценены", review: "Проверить", gross: "Грубые ошибки", appeal: "Апелляция" }[f.status])}»</button>` : ""}
+      </div>
+      <div class="table-wrap"><table class="list"><thead><tr><th>Диалог</th><th>Канал</th><th>Итоговый балл</th><th>Статус</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>`;
 
     const draw = () => {
-      const rows = dialogs.filter((d) => (!f.q || d.conversation_id.includes(f.q)) && (!f.lang || d.language === f.lang) && (!f.ch || d.channel === f.ch)
-        && (!f.status || ({ todo: !d.evaluation, review: d.evaluation?.low_confidence, gross: d.evaluation?.gross_violation, appeal: d.evaluation?.open_appeals })[f.status]));
+      const rows = dialogs.filter((d) => (!f.q || d.conversation_id.includes(f.q)) && (!f.lang || d.language === f.lang) && (!f.ch || d.channel === f.ch) && (!f.status || statusOf(d).k === f.status));
       state.order = rows.map((d) => d.conversation_id);
       $("#rows").innerHTML = rows.map((d) => {
-        const e = d.evaluation, changed = e && e.total !== e.original_total;
+        const e = d.evaluation, s = statusOf(d), changed = e && e.total !== e.original_total;
         return `<tr class="click" data-id="${esc(d.conversation_id)}">
-          <td><b>${esc(d.conversation_id)}</b><div class="small muted">${esc(d.group_id)}</div></td>
-          <td><span class="ch">${ic(d.channel === "voice call" ? "phone" : "chat")}${d.channel === "voice call" ? "Звонок" : "Чат"}</span></td>
-          <td>${esc(LANG[d.language] || d.language)}</td><td>${d.messages}</td>
-          <td>${e ? `<div class="mini-bar"><div class="track"><div class="fill b-${tone(e.total)}" style="width:${e.total || 0}%"></div></div><span class="score c-${tone(e.total)}">${changed ? `<s class="old">${num(e.original_total)}</s>` : ""}${num(e.total)}</span></div>` : `<span class="muted">не оценён</span>`}</td>
-          <td>${e ? (e.gross_violation ? `<span class="chip no">${ic("flag")} Есть</span>` : `<span class="chip yes">Нет</span>`) : ""}</td>
-          <td>${e && e.open_appeals ? `<span class="chip warn">${e.open_appeals} на рассмотрении</span>` : ""}
-            ${e && e.low_confidence ? `<span class="chip na" title="Модель не уверена — стоит проверить человеку">? проверить ${e.low_confidence}</span>` : ""}</td></tr>`;
-      }).join("") || `<tr><td colspan="7" class="empty">Ничего не найдено</td></tr>`;
+          <td><b class="mono">${esc(d.conversation_id)}</b><span class="muted small"> · ${d.messages} реплик</span></td>
+          <td><span class="ch">${ic(d.channel === "voice call" ? "phone" : "chat")}${d.channel === "voice call" ? "Звонок" : "Чат"}<span class="lang">${esc(d.language)}</span></span></td>
+          <td>${e ? `<div class="mini-bar"><div class="track"><div class="fill b-${tone(e.total)}" style="width:${e.total || 0}%"></div></div><span class="score c-${tone(e.total)}">${changed ? `<s class="old">${num(e.original_total)}</s>` : ""}${num(e.total)}</span></div>` : `<span class="muted">—</span>`}</td>
+          <td><span class="chip ${s.cls}">${s.label}</span></td>
+          <td class="go">${ic("next")}</td></tr>`;
+      }).join("") || `<tr><td colspan="5" class="empty">Ничего не найдено — измените фильтры</td></tr>`;
     };
     draw();
     $("#rows").onclick = (e) => { const tr = e.target.closest("tr[data-id]"); if (tr) location.hash = "#/dialog/" + encodeURIComponent(tr.dataset.id); };
     $("#f-q").oninput = (e) => { f.q = e.target.value.trim(); draw(); };
-    for (const [id, key] of [["f-lang", "lang"], ["f-ch", "ch"], ["f-st", "status"]]) {
+    for (const [id, key] of [["f-lang", "lang"], ["f-ch", "ch"]]) {
       $("#" + id).onclick = (e) => { const b = e.target.closest("button"); if (!b) return; f[key] = b.dataset.v; $$("#" + id + " button").forEach((x) => x.classList.toggle("on", x === b)); draw(); };
     }
-    $("#f-group").onchange = (e) => { f.group = e.target.value; router(); };
+    $$(".stat[data-st]").forEach((b) => (b.onclick = () => { f.status = f.status === b.dataset.st ? "" : b.dataset.st; router(); }));
+    const reset = $("#f-reset"); if (reset) reset.onclick = () => { f.status = ""; router(); };
+    $("#f-group").onchange = (e) => { f.group = e.target.value.split(" · ")[0]; router(); };
     $("#load-btn").onclick = async () => {
       const g = $("#load-group").value.trim();
       if (!g) return toast("Укажите group_id", true);
-      const b = $("#load-btn"); b.disabled = true; b.innerHTML = `<span class="spin"></span> Загрузка`;
+      const b = $("#load-btn"); b.disabled = true; b.innerHTML = `<span class="spin"></span>`;
       try { const r = await api("/groups/load", { body: { group_id: g } }); toast(`Загружено ${r.loaded} диалогов (${r.group_id})`); f.group = r.group_id; router(); }
-      catch (e) { toast(e.message, true); b.disabled = false; b.textContent = "Загрузить набор"; }
+      catch (e) { toast(e.message, true); b.disabled = false; b.textContent = "Загрузить"; }
     };
     $("#batch-btn").onclick = async () => {
       try { state.job = await api("/batch", { body: { group_id: f.group || undefined, only_missing: true } }); if (!state.job.total) toast("Все диалоги уже оценены активным чек-листом"); watchJob(); }
@@ -195,9 +216,9 @@
     const box = $("#job-box"), j = state.job;
     if (box && j) {
       const pct = j.total ? Math.round(j.done / j.total * 100) : 100;
-      box.innerHTML = `<div class="panel row" style="margin-bottom:14px;padding:12px 16px">
-        ${j.status === "running" ? `<span class="spin"></span>` : ic("ok")} <b>Пакетная оценка</b> <span class="muted">чек-лист v${j.checklist_id}</span>
-        <div class="progress"><div style="width:${pct}%"></div></div><span class="score">${j.done} / ${j.total}</span>
+      box.innerHTML = `<div class="job">
+        ${j.status === "running" ? `<span class="spin"></span>` : ic("ok")}<b>${j.status === "running" ? "Идёт оценка" : "Оценка завершена"}</b>
+        <div class="progress"><div style="width:${pct}%"></div></div><span class="score">${j.done} из ${j.total}</span>
         ${j.errors.length ? `<span class="chip no" title="${esc(j.errors.map((e) => e.conversation_id + ": " + e.error).join("\n"))}">ошибок: ${j.errors.length}</span>` : ""}
         <span class="grow"></span>${j.status === "running" ? `<button class="btn sm" id="job-cancel">Остановить</button>` : `<button class="btn sm ghost" id="job-hide">Скрыть</button>`}</div>`;
       const c = $("#job-cancel"); if (c) c.onclick = () => api(`/jobs/${j.id}/cancel`, { method: "POST", body: {} });
@@ -207,13 +228,13 @@
     jobTimer = setTimeout(async () => {
       try {
         state.job = await api("/jobs/" + j.id);
-        if (state.job.status !== "running") { toast(`Пакетная оценка завершена: ${state.job.done} диалогов`); refreshMeta(); if (/^#\/dialogs|^$/.test(location.hash)) return router(); }
+        if (state.job.status !== "running") { toast(`Оценка завершена: ${state.job.done} диалогов`); refreshMeta(); if (/^#\/dialogs|^$/.test(location.hash)) return router(); }
       } catch (e) { state.job = null; }
       watchJob();
     }, 2000);
   }
 
-  // ---------- анализ разговора ----------
+  // ---------- карточка диалога ----------
   async function viewDialog(v, id, qs) {
     if (!state.checklists.length) state.checklists = await api("/checklists");
     const d = await api("/dialogs/" + encodeURIComponent(id));
@@ -223,50 +244,51 @@
     const isCall = d.channel === "voice call";
     const off = msgOffsets(d.transcript);
     const dur = Math.max(10, (off[off.length - 1] || 0) + 6);
-    const ui = { t: 0, playing: false, speed: isCall ? 1 : 4, sel: null, crit: qs.get("c") || null, raf: 0, last: 0, follow: true };
+    const ui = { t: 0, playing: false, speed: isCall ? 1 : 4, crit: qs.get("c") || null, raf: 0, last: 0, follow: true };
+    const pos = state.order ? state.order.indexOf(d.conversation_id) : -1;
 
     v.innerHTML = `
-      <div class="head">
-        <a class="btn ghost" href="#/dialogs" style="padding-left:0">${ic("back")} Диалоги</a>
-      </div>
-      <div class="head" style="margin-top:-10px">
-        <div class="grow"><h1>Анализ разговора</h1>
-          <p class="sub">${isCall ? "Звонок" : "Чат"} ${esc(d.conversation_id)} · ${esc(LANG[d.language] || d.language)} · ${fmtSec(dur - 6)}</p></div>
-        <div class="evbar" style="margin:0">
-          ${done.length > 1 ? `<select id="ev-hist" title="История оценок">${done.map((e) => `<option value="${e.id}" ${ev && e.id === ev.id ? "selected" : ""}>Оценка #${e.id} · v${e.checklist_id} · ${e.created_at.slice(5, 16).replace("T", " ")}</option>`).join("")}</select>` : ""}
-          <select id="ev-cl" title="Чек-лист">${state.checklists.map((c) => `<option value="${c.id}" ${c.active ? "selected" : ""}>v${c.id} · ${esc(c.name)}${c.active ? " ✓" : ""}</option>`).join("")}</select>
-          <button class="btn pri" id="ev-run">${ic("bolt")} ${ev ? "Переоценить" : "Оценить"}</button>
-        </div>
+      <nav class="crumbs"><a href="#/dialogs">${ic("back")} Все диалоги</a>
+        ${pos >= 0 ? `<span class="grow"></span><span class="muted small">${pos + 1} из ${state.order.length}</span>
+          <a class="btn sm ghost" href="#/dialog/${encodeURIComponent(state.order[pos - 1] || "")}" ${pos ? "" : "hidden"} title="Предыдущий (p)">${ic("back")}</a>
+          <a class="btn sm ghost" href="#/dialog/${encodeURIComponent(state.order[pos + 1] || "")}" ${pos < state.order.length - 1 ? "" : "hidden"} title="Следующий (n)">${ic("next")}</a>` : ""}</nav>
+      ${pageHead(`${isCall ? "Звонок" : "Чат"} <span class="mono">${esc(d.conversation_id)}</span>`,
+        `${esc(LANG[d.language] || d.language)} · ${fmtSec(dur - 6)} · ${d.transcript.length} реплик`,
+        `${ev ? `<span class="score-pill b-${tone(ev.final.total)}">${num(ev.final.total)}<small>/100</small></span>` : ""}
+         <button class="btn ${ev ? "" : "pri"}" id="ev-run">${ic("bolt")} ${ev ? "Оценить заново" : "Оценить диалог"}</button>`)}
+      <div class="settings-line">
+        <label>Чек-лист <select id="ev-cl">${state.checklists.map((c) => `<option value="${c.id}" ${c.active ? "selected" : ""}>v${c.id} · ${esc(c.name)}${c.active ? " (активный)" : ""}</option>`).join("")}</select></label>
+        ${done.length > 1 ? `<label>Показана оценка <select id="ev-hist">${done.map((e) => `<option value="${e.id}" ${ev && e.id === ev.id ? "selected" : ""}>#${e.id} · v${e.checklist_id} · ${e.created_at.slice(5, 16).replace("T", " ")}</option>`).join("")}</select></label>` : ""}
+        ${isCall && d.audio_url ? `<a href="${esc(d.audio_url)}" target="_blank" rel="noopener">${ic("ext")} Оригинальная запись звонка</a>` : ""}
       </div>
 
-      <section class="panel wave-panel">
+      <section class="card timeline">
         <div class="lanes" id="lanes"></div>
         <div class="player">
-          <button class="play" id="play" title="Воспроизвести ход разговора">${ic("play", "")}</button>
+          <button class="play" id="play" title="Воспроизвести ход разговора (Пробел)">${ic("play", "")}</button>
           <span class="time" id="time">00:00 / ${fmtSec(dur)}</span>
           <div class="scrub" id="scrub"><div class="t"></div><div class="p" id="sp"></div><div class="k" id="sk"></div></div>
-          <button class="speed" id="speed">${ui.speed}×</button>
-          ${isCall && d.audio_url ? `<a class="btn sm" href="${esc(d.audio_url)}" target="_blank" rel="noopener">${ic("ext")} Запись</a>` : ""}
+          <button class="speed" id="speed" title="Скорость воспроизведения">${ui.speed}×</button>
         </div>
       </section>
 
       <div class="work">
-        <section class="panel">
-          <div class="panel-h"><h2 class="grow">Расшифровка</h2><span class="small muted">${d.transcript.length} реплик · бот и система — контекст</span></div>
+        <section class="card">
+          <div class="card-h"><h2>Расшифровка</h2><span class="muted small">бот и система — серым, это контекст</span></div>
           <div class="transcript" id="tr">${d.transcript.map((m, i) => `
             <div class="msg ${esc(m.speaker)}" id="m-${i + 1}" data-i="${i}">
-              <div class="meta"><span class="ts">${fmtSec(off[i])}</span><span class="who">${ROLE[m.speaker] || esc(m.speaker)}</span><span class="n">#${i + 1}</span></div>
+              <div class="meta"><span class="who">${ROLE[m.speaker] || esc(m.speaker)}</span><span class="ts">${fmtSec(off[i])}</span><span class="n">#${i + 1}</span></div>
               <div class="txt">${esc(m.text)}</div>
             </div>`).join("")}</div>
         </section>
-        <section class="panel" id="qa"></section>
+        <section id="qa"></section>
       </div>`;
 
-    // --- волна ---
+    // --- лента разговора: полосы реплик по ролям ---
     const lanesDef = [["client", "Клиент"], ["operator", "Оператор"]];
     if (d.transcript.some((m) => m.speaker === "bot")) lanesDef.push(["bot", "Бот"]);
-    const hash = (a, b) => { let h = (a * 2654435761 + b * 40503) >>> 0; h ^= h >>> 13; h = Math.imul(h, 1274126177) >>> 0; return (h % 1000) / 1000; };
-    const W = 1000, H = 46;
+    const hash = (a, b) => { let x = (a * 2654435761 + b * 40503) >>> 0; x ^= x >>> 13; x = Math.imul(x, 1274126177) >>> 0; return (x % 1000) / 1000; };
+    const W = 1000, H = 36;
     $("#lanes").innerHTML = lanesDef.map(([sp, label]) => {
       let bars = "";
       d.transcript.forEach((m, i) => {
@@ -276,8 +298,8 @@
         const x0 = start / dur * W, x1 = Math.min(W, (start + len) / dur * W);
         for (let x = x0, j = 0; x < x1; x += 4.2, j++) {
           const env = Math.sin(Math.PI * Math.min(1, (x - x0) / Math.max(4, x1 - x0))) * .75 + .25;
-          const h = Math.max(3, (0.25 + hash(i, j) * 0.75) * env * (H - 6));
-          bars += `<rect x="${x.toFixed(1)}" y="${((H - h) / 2).toFixed(1)}" width="2.4" height="${h.toFixed(1)}" rx="1.2"/>`;
+          const hh = Math.max(3, (0.25 + hash(i, j) * 0.75) * env * (H - 6));
+          bars += `<rect x="${x.toFixed(1)}" y="${((H - hh) / 2).toFixed(1)}" width="2.4" height="${hh.toFixed(1)}" rx="1.2"/>`;
         }
       });
       return `<div class="lane-l">${label}</div><div class="lane ${sp}" data-lane>
@@ -287,43 +309,34 @@
 
     const msgAt = (t) => { let k = 0; for (let i = 0; i < off.length; i++) if (off[i] <= t + .01) k = i; return k; };
     function setSel(a, b) {
-      ui.sel = a == null ? null : [a, b ?? a];
       $$(".wave-sel").forEach((el) => {
-        if (!ui.sel) return (el.hidden = true);
-        const s = off[ui.sel[0]], e = ui.sel[1] + 1 < off.length ? off[ui.sel[1] + 1] : dur;
+        if (a == null) return (el.hidden = true);
+        const s = off[a], e = b + 1 < off.length ? off[b + 1] : dur;
         el.hidden = false;
         el.style.left = (s / dur * 100) + "%";
         el.style.width = Math.max(0.8, (e - s) / dur * 100) + "%";
       });
     }
+    const scrollMsg = (el) => { const box = $("#tr"); box.scrollTop = el.offsetTop - box.offsetTop - box.clientHeight / 2 + el.clientHeight / 2; };
     function setTime(t, scroll) {
       ui.t = Math.max(0, Math.min(dur, t));
       const pct = ui.t / dur * 100;
       $("#sp").style.width = pct + "%"; $("#sk").style.left = pct + "%";
       $("#time").textContent = `${fmtSec(ui.t)} / ${fmtSec(dur)}`;
-      const k = msgAt(ui.t);
-      const prev = $(".msg.now"); const cur = $("#m-" + (k + 1));
-      if (prev !== cur) { if (prev) prev.classList.remove("now"); if (cur) cur.classList.add("now"); if (scroll && ui.follow && cur) scrollMsg(cur); }
-    }
-    function scrollMsg(el) {
-      const box = $("#tr");
-      box.scrollTop = el.offsetTop - box.offsetTop - box.clientHeight / 2 + el.clientHeight / 2;
+      const cur = $("#m-" + (msgAt(ui.t) + 1)), prev = $(".msg.now");
+      if (prev !== cur) { prev?.classList.remove("now"); cur?.classList.add("now"); if (scroll && ui.follow && cur) scrollMsg(cur); }
     }
     function highlight(a, b, focus, quote) {
       $$(".msg.hl, .msg.inrange").forEach((m) => m.classList.remove("hl", "inrange"));
       $$(".msg .txt mark").forEach((mk) => { const i = +mk.closest(".msg").dataset.i; mk.parentElement.textContent = d.transcript[i].text; });
       if (a == null) return setSel(null);
       for (let i = a; i <= (b ?? a); i++) $("#m-" + (i + 1))?.classList.add("inrange");
-      const f = focus ?? a;
-      const el = $("#m-" + (f + 1));
+      const f = focus ?? a, el = $("#m-" + (f + 1));
       if (el) {
         el.classList.add("hl"); scrollMsg(el);
-        // подсвечиваем точную цитату модели внутри реплики, если она там есть дословно
-        const text = d.transcript[f].text, at = quote ? text.toLowerCase().indexOf(quote.toLowerCase().replace(/[.…]+$/, "")) : -1;
-        if (at >= 0) {
-          const len = quote.replace(/[.…]+$/, "").length;
-          $(".txt", el).innerHTML = esc(text.slice(0, at)) + "<mark>" + esc(text.slice(at, at + len)) + "</mark>" + esc(text.slice(at + len));
-        }
+        // подсвечиваем дословную цитату модели внутри реплики
+        const text = d.transcript[f].text, qn = (quote || "").replace(/[.…]+$/, ""), at = qn ? text.toLowerCase().indexOf(qn.toLowerCase()) : -1;
+        if (at >= 0) $(".txt", el).innerHTML = esc(text.slice(0, at)) + "<mark>" + esc(text.slice(at, at + qn.length)) + "</mark>" + esc(text.slice(at + qn.length));
       }
       setSel(a, b ?? a);
       setTime(off[f], false);
@@ -348,36 +361,33 @@
     const seekFrom = (el, e) => { const r = el.getBoundingClientRect(); const t = (e.clientX - r.left) / r.width * dur; setTime(t, true); const k = msgAt(t); highlight(k, k); };
     $("#scrub").onclick = (e) => seekFrom($("#scrub"), e);
     $$("[data-lane]").forEach((l) => (l.onclick = (e) => seekFrom(l, e)));
-    $("#tr").onclick = (e) => { const m = e.target.closest(".msg"); if (m) { const i = +m.dataset.i; highlight(i, i); } };
+    $("#tr").onclick = (e) => { const m = e.target.closest(".msg"); if (m) highlight(+m.dataset.i, +m.dataset.i); };
     $("#tr").onwheel = () => { ui.follow = false; };
     setTime(0);
 
-    $("#ev-run").onclick = async () => {
-      const btn = $("#ev-run"); btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Оценка…`;
+    const runEval = async () => {
+      const btn = $("#ev-run"); btn.disabled = true; btn.innerHTML = `<span class="spin"></span> Модель оценивает…`;
       try {
         const r = await api("/evaluations", { body: { conversation_id: d.conversation_id, checklist_id: +$("#ev-cl").value } });
         if (r.status === "error") throw new Error(r.error);
-        toast(`Оценка готова: ${num(r.final.total)} / 100`);
+        toast(`Оценка готова: ${num(r.final.total)} из 100`);
         location.hash = `#/dialog/${encodeURIComponent(d.conversation_id)}?ev=${r.id}`;
-      } catch (e) { toast(e.message, true); btn.disabled = false; btn.innerHTML = `${ic("bolt")} Оценить`; }
+      } catch (e) { toast(e.message, true); btn.disabled = false; btn.innerHTML = `${ic("bolt")} Оценить диалог`; }
     };
+    $("#ev-run").onclick = runEval;
     const hist = $("#ev-hist");
     if (hist) hist.onchange = () => { location.hash = `#/dialog/${encodeURIComponent(d.conversation_id)}?ev=${hist.value}`; };
 
-    const h = { highlight };
+    const h = { highlight, runEval };
     renderQA(d, ev, ui, h);
     const m = +qs.get("m"); if (m) highlight(m - 1, m - 1);
 
     state.keys = (k) => {
       if (k === " ") return toggle(), true;
-      if (k === "e") return $("#ev-run").click(), true;
-      if (k === "Escape") return location.hash = "#/dialogs", true;
+      if (k === "e") return runEval(), true;
+      if (k === "Escape") return (location.hash = "#/dialogs"), true;
       const step = { n: 1, p: -1 }[k];
-      if (step && state.order?.length) {
-        const i = state.order.indexOf(d.conversation_id) + step;
-        if (state.order[i]) location.hash = "#/dialog/" + encodeURIComponent(state.order[i]);
-        return true;
-      }
+      if (step && pos >= 0) { const nx = state.order[pos + step]; if (nx) location.hash = "#/dialog/" + encodeURIComponent(nx); return true; }
       return h.key ? h.key(k) : false;
     };
   }
@@ -386,134 +396,140 @@
     if (c.type === "flag" || fin.points == null) return 0;
     return Math.round((fin.effective_weight - fin.points) * 100) / 100;
   }
+  const shortExpl = (s) => { s = (s || "").trim(); const m = s.match(/^.{20,140}?[.!?](\s|$)/); return m ? m[0].trim() : s.length > 140 ? s.slice(0, 137) + "…" : s || "без пояснения"; };
 
   function renderQA(d, ev, ui, h) {
     const qa = $("#qa");
     if (!ev) {
-      qa.innerHTML = `<div class="panel-h"><h2>Оценка качества</h2></div>
-        <div class="empty">${ic("target")}<br>Диалог ещё не оценён.<br>Выберите чек-лист и нажмите «Оценить».</div>`;
+      qa.innerHTML = `<div class="card empty-card">${ic("target")}<h2>Диалог ещё не оценён</h2>
+        <p class="muted">Модель проверит работу оператора по ${state.active?.criteria.length || ""} критериям чек-листа, покажет баллы и реплики-доказательства.</p>
+        <button class="btn pri" id="ev-run2">${ic("bolt")} Оценить диалог</button><p class="muted small">или нажмите <kbd>e</kbd></p></div>`;
+      $("#ev-run2").onclick = h.runEval;
       return;
     }
     const cl = ev.checklist, fin = ev.final, orig = ev.original;
     const items = Object.fromEntries(ev.items.map((it) => [it.criterion_id, it]));
     const scored = cl.criteria.filter((c) => c.type !== "flag");
     const losses = scored.map((c) => ({ c, loss: lossOf(c, fin.criteria[c.id]) })).filter((x) => x.loss > 0).sort((a, b) => b.loss - a.loss);
-    if (!ui.crit || !cl.criteria.some((c) => c.id === ui.crit)) ui.crit = (losses[0] || { c: scored[0] }).c.id;
-    const R = 64, C = 2 * Math.PI * R, val = fin.total ?? 0;
+    if (ui.crit && !cl.criteria.some((c) => c.id === ui.crit)) ui.crit = null;
+    const R = 50, C = 2 * Math.PI * R;
     const changed = fin.total !== orig.total;
     const f = ev.facts || {};
-    const gross = cl.criteria.find((c) => c.type === "flag");
+    const review = ev.items.filter((it) => (it.confidence ?? 1) < 0.7).length;
 
     qa.innerHTML = `
-      <div class="panel-h"><h2 class="grow">Оценка качества</h2><span class="small muted">#${ev.id} · чек-лист v${ev.checklist_id}</span></div>
-      <div class="qa-top">
+      <div class="card summary">
         <div class="ring">
-          <svg viewBox="0 0 150 150"><circle class="bgc" cx="75" cy="75" r="${R}" fill="none" stroke-width="11"/>
-            <circle class="fg" cx="75" cy="75" r="${R}" fill="none" stroke="${toneColor(fin.total)}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>
-          <div class="c">${changed ? `<div class="o">${num(orig.total)}</div>` : ""}<div class="v c-${tone(fin.total)}">${num(fin.total)}</div><div class="m">/ 100</div></div>
+          <svg viewBox="0 0 120 120"><circle class="bgc" cx="60" cy="60" r="${R}" fill="none" stroke-width="10"/>
+            <circle class="fg" cx="60" cy="60" r="${R}" fill="none" stroke="${toneColor(fin.total)}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}"/></svg>
+          <div class="c"><div class="v c-${tone(fin.total)}">${num(fin.total)}</div><div class="m">из 100</div></div>
         </div>
-        <div class="clist">${scored.map((c) => {
-          const e = fin.criteria[c.id];
-          const pts = e.answer === "na" ? `<span class="muted">N/A</span>` : `${num(e.points)} <small>/ ${num(e.effective_weight)}</small>`;
-          const low = (items[c.id]?.confidence ?? 1) < 0.7;
-          return `<button class="citem ${c.id === ui.crit ? "on" : ""}" data-crit="${c.id}">${answerIcon(c, e.answer)}<span class="nm" title="${esc(c.name)}">${esc(c.name)}${low ? ` <span class="low" title="Модель не уверена — проверьте">?</span>` : ""}</span><span class="pt c-${e.answer === "na" ? "" : tone(e.points / e.effective_weight * 100)}">${pts}</span></button>`;
-        }).join("")}
-        ${gross ? `<button class="citem ${gross.id === ui.crit ? "on" : ""}" data-crit="${gross.id}">${answerIcon(gross, fin.criteria[gross.id].answer)}<span class="nm">${esc(gross.name)}</span><span class="pt">${fin.gross_violation ? `<span class="c-lo">выявлены</span>` : `<span class="muted">нет</span>`}</span></button>` : ""}
+        <div class="sum-body">
+          ${changed ? `<div class="small muted">Было ${num(orig.total)} — изменено по апелляции</div>` : ""}
+          <div class="sections">${fin.sections.map((s) => `
+            <div class="sec"><span>${esc(s.name)}</span><div class="track"><div class="fill b-${tone(s.percent)}" style="width:${s.percent}%"></div></div><b>${num(s.points)}<small>/${num(s.max_points)}</small></b></div>`).join("")}</div>
         </div>
       </div>
-      ${fin.gross_violation ? `<div class="gross-bar">${ic("flag")} Грубая ошибка — отмечается отдельно от балла</div>` : ""}
-      <div class="why">
-        <h3>${losses.length ? "Почему снижена оценка" : "Оценка не снижена"}</h3>
-        ${losses.length ? `<ul>${losses.slice(0, 4).map(({ c, loss }) => `<li><b>−${num(loss)}</b><span><a href="#" data-crit="${c.id}">${esc(c.name)}</a>: ${esc(shortExpl(items[c.id]?.explanation))}</span></li>`).join("")}</ul>`
-          : `<p class="muted" style="margin:0">Все применимые критерии выполнены полностью.</p>`}
-        ${ev.summary ? `<p class="small muted" style="margin:10px 0 0">${esc(ev.summary)}</p>` : ""}
-        <div class="facts">
-          ${f.first_response_wait_sec != null ? `<span class="fact ${f.first_response_over_threshold ? "bad" : ""}">Первая реакция <b>${fmtSec(f.first_response_wait_sec)}</b> · порог ${fmtSec(f.first_response_threshold_sec)}</span>` : ""}
-          ${f.longest_operator_reply_gap_sec != null ? `<span class="fact">Макс. пауза <b>${fmtSec(f.longest_operator_reply_gap_sec)}</b></span>` : ""}
-          ${fin.sections.map((s) => `<span class="fact">${esc(s.name)} <b>${num(s.points)}/${num(s.max_points)}</b></span>`).join("")}
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn pri" id="go-frag">${ic("target")} Перейти к фрагменту</button>
-        <button class="btn" id="go-appeal">${ic("scale")} Оспорить оценку</button>
-      </div>
-      <div id="detail"></div>
-      <p class="small muted" style="margin:12px 0 0">${esc(ev.model || "")}${ev.usage ? ` · ${ev.usage.input_tokens + ev.usage.output_tokens} токенов · $${ev.usage.cost_usd} · ${ev.usage.seconds} с` : ""}</p>`;
+      ${fin.gross_violation ? `<div class="banner bad">${ic("flag")}<div><b>Грубая ошибка оператора</b><br><span>Отмечается отдельно от балла — см. критерий «${esc(cl.criteria.find((c) => c.type === "flag")?.name || "")}»</span></div></div>` : ""}
+      ${review ? `<div class="banner info">${ic("search")}<div><b>Нужна проверка человеком: ${review}</b><br><span>Модель не уверена в отмеченных «?» критериях</span></div></div>` : ""}
+      ${losses.length ? `<div class="card why"><h3>Почему снижена оценка</h3>
+        ${losses.slice(0, 3).map(({ c, loss }) => `<button class="why-row" data-open="${c.id}"><b>−${num(loss)}</b><span><em>${esc(c.name)}.</em> ${esc(shortExpl(items[c.id]?.explanation))}</span>${ic("next")}</button>`).join("")}</div>`
+        : `<div class="card why"><h3>Оценка не снижена</h3><p class="muted">Все применимые критерии выполнены полностью.</p></div>`}
 
-    requestAnimationFrame(() => { const fg = $(".ring .fg"); if (fg) fg.style.strokeDashoffset = C * (1 - Math.max(0, Math.min(100, val)) / 100); });
+      <div class="card crits">
+        <div class="card-h"><h2>Критерии</h2><span class="muted small">нажмите, чтобы раскрыть · <kbd>j</kbd> <kbd>k</kbd></span></div>
+        ${cl.criteria.map((c) => critRow(c, items[c.id] || {}, fin.criteria[c.id], orig.criteria[c.id], ev.appeals.filter((a) => a.criterion_id === c.id), c.id === ui.crit)).join("")}
+      </div>
 
-    const showDetail = (openAppeal) => {
-      $$(".citem").forEach((b) => b.classList.toggle("on", b.dataset.crit === ui.crit));
-      const c = cl.criteria.find((x) => x.id === ui.crit);
-      $("#detail").innerHTML = detailBlock(c, items[c.id] || {}, fin.criteria[c.id], orig.criteria[c.id], ev.appeals.filter((a) => a.criterion_id === c.id));
-      if (openAppeal) { const b = $("#ap-form"); if (b) { b.hidden = false; $("textarea", b).focus(); } else toast("По этому критерию апелляция уже на рассмотрении"); }
-    };
-    const jump = () => {
-      const it = items[ui.crit] || {};
-      const r = it.checked_range && it.checked_range[0] ? it.checked_range : null;
-      const ev0 = (it.evidence || [])[0];
-      if (r) h.highlight(r[0] - 1, r[1] - 1, ev0 ? ev0 - 1 : r[0] - 1, ev0 && it.quote);
-      else if (ev0) h.highlight(ev0 - 1, ev0 - 1, undefined, it.quote);
-      else toast("Модель не указала реплики для этого критерия", true);
-    };
-    showDetail(false);
+      <div class="foot-meta">
+        ${f.first_response_wait_sec != null ? `<span class="${f.first_response_over_threshold ? "c-lo" : ""}">Первая реакция ${fmtSec(f.first_response_wait_sec)} (норма до ${fmtSec(f.first_response_threshold_sec)})</span>` : ""}
+        ${f.longest_operator_reply_gap_sec != null ? `<span>Макс. пауза ${fmtSec(f.longest_operator_reply_gap_sec)}</span>` : ""}
+        <span>Оценка #${ev.id} · чек-лист v${ev.checklist_id}</span>
+        <span>${esc(ev.model || "")}${ev.usage ? ` · $${ev.usage.cost_usd} · ${ev.usage.seconds} с` : ""}</span>
+      </div>`;
+
+    requestAnimationFrame(() => { const fg = $(".ring .fg"); if (fg) fg.style.strokeDashoffset = C * (1 - Math.max(0, Math.min(100, fin.total ?? 0)) / 100); });
 
     const ids = cl.criteria.map((c) => c.id);
+    const jump = (cid) => {
+      const it = items[cid] || {};
+      const r = it.checked_range && it.checked_range[0] ? it.checked_range : null;
+      const ev0 = (it.evidence || [])[0];
+      if (ev0) h.highlight((r ? r[0] : ev0) - 1, (r ? r[1] : ev0) - 1, ev0 - 1, it.quote);
+      else if (r) h.highlight(r[0] - 1, r[1] - 1);
+    };
+    const open = (cid, scroll) => {
+      ui.crit = ui.crit === cid && !scroll ? null : cid;
+      $$(".crit").forEach((el) => el.classList.toggle("open", el.dataset.c === ui.crit));
+      if (ui.crit) { jump(ui.crit); if (scroll) $(`.crit[data-c="${cid}"]`).scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+    };
+    const appeal = (cid) => {
+      open(cid, true); ui.crit = cid; $$(".crit").forEach((el) => el.classList.toggle("open", el.dataset.c === cid));
+      const form = $(`.crit[data-c="${cid}"] .ap-form`);
+      if (!form) return toast("По этому критерию апелляция уже на рассмотрении");
+      form.hidden = false; $("textarea", form).focus();
+    };
+    if (ui.crit) open(ui.crit, true);
+
     h.key = (k) => {
       const step = { j: 1, ArrowDown: 1, k: -1, ArrowUp: -1 }[k];
-      if (step) { ui.crit = ids[(ids.indexOf(ui.crit) + step + ids.length) % ids.length]; showDetail(false); jump(); return true; }
-      if (k === "f" || k === "Enter") return jump(), true;
-      if (k === "a") return showDetail(true), true;
+      if (step) { const i = ui.crit ? ids.indexOf(ui.crit) : -1; open(ids[(i + step + ids.length) % ids.length], true); return true; }
+      if ((k === "f" || k === "Enter") && ui.crit) return jump(ui.crit), true;
+      if (k === "a" && ui.crit) return appeal(ui.crit), true;
       return false;
     };
 
     qa.onclick = async (e) => {
-      const ci = e.target.closest("[data-crit]");
-      if (ci) { e.preventDefault(); ui.crit = ci.dataset.crit; showDetail(false); if (ci.tagName === "A") jump(); return; }
-      if (e.target.closest("#go-frag")) return jump();
-      if (e.target.closest("#go-appeal")) return showDetail(true);
-      const j = e.target.closest("[data-jump]");
-      if (j) { const [a, b] = j.dataset.jump.split("-").map(Number); return h.highlight(a - 1, (b || a) - 1, j.dataset.focus ? +j.dataset.focus - 1 : undefined); }
-      if (e.target.closest("[data-ap-open]")) { $("#ap-form").hidden = false; $("#ap-form textarea").focus(); return; }
-      if (e.target.closest("#ap-send")) {
-        const box = $("#ap-form");
+      const t = e.target;
+      const why = t.closest("[data-open]"); if (why) return open(why.dataset.open, true);
+      const head = t.closest(".crit-head"); if (head) return open(head.closest(".crit").dataset.c);
+      const j = t.closest("[data-jump]"); if (j) return jump(j.closest(".crit").dataset.c);
+      const ap = t.closest("[data-appeal]"); if (ap) return appeal(ap.closest(".crit").dataset.c);
+      const cancel = t.closest("[data-cancel]"); if (cancel) { cancel.closest(".ap-form").hidden = true; return; }
+      const send = t.closest("[data-send]");
+      if (send) {
+        const form = send.closest(".ap-form"), cid = send.closest(".crit").dataset.c;
+        send.disabled = true;
         try {
-          await api("/appeals", { body: { evaluation_id: ev.id, criterion_id: ui.crit, comment: $("textarea", box).value, author: $("input", box).value } });
-          toast("Апелляция подана — она появилась у проверяющего");
+          await api("/appeals", { body: { evaluation_id: ev.id, criterion_id: cid, comment: $("textarea", form).value, author: $("input", form).value } });
+          toast("Апелляция отправлена проверяющему");
           refreshMeta();
-          const fresh = await api("/evaluations/" + ev.id);
-          renderQA(d, fresh, ui, h);
-        } catch (err) { toast(err.message, true); }
+          renderQA(d, await api("/evaluations/" + ev.id), ui, h);
+        } catch (err) { toast(err.message, true); send.disabled = false; }
       }
     };
   }
 
-  const shortExpl = (s) => { s = (s || "").trim(); const m = s.match(/^.{20,160}?[.!?](\s|$)/); return m ? m[0].trim() : s.length > 160 ? s.slice(0, 157) + "…" : s || "без пояснения"; };
-
-  function detailBlock(c, it, fin, orig, appeals) {
+  function critRow(c, it, fin, orig, appeals, isOpen) {
     const changed = orig && fin && orig.answer !== fin.answer;
+    const low = (it.confidence ?? 1) < 0.7;
+    const openAppeal = appeals.some((a) => a.status === "open");
+    const pts = c.type === "flag" ? (fin.answer === "yes" ? `<span class="c-lo">выявлены</span>` : `<span class="muted">нет</span>`)
+      : fin.answer === "na" ? `<span class="muted">N/A</span>` : `${num(fin.points)}<small>/${num(fin.effective_weight)}</small>`;
     const range = it.checked_range && it.checked_range[0] ? it.checked_range : null;
-    const open = appeals.some((a) => a.status === "open");
-    const pts = c.type === "flag" ? "Без баллов — отмечается отдельно" : fin.points == null ? `N/A — вес ${c.weight} перераспределён между применимыми критериями` : `${num(fin.points)} из ${num(fin.effective_weight)} · базовый вес ${c.weight}`;
-    return `<div class="detail ${changed ? "changed" : ""}">
-      <div class="dh"><span class="code">${esc(c.code)}</span><h3 class="grow">${esc(c.name)}</h3>${changed ? `<s class="old">${esc(answerLabel(c, orig.answer))}</s>` : ""}${answerChip(c, fin.answer)}</div>
-      <div class="small muted" style="margin-top:2px">${pts}</div>
-      <div class="expl">${esc(it.explanation || "—")}</div>
-      ${it.quote ? `<blockquote class="quote">«${esc(it.quote)}»</blockquote>` : ""}
-      ${it.confidence != null ? `<div class="conf ${it.confidence < 0.7 ? "low" : ""}"><span>Уверенность модели</span><div class="track"><div style="width:${Math.round(it.confidence * 100)}%"></div></div><b>${Math.round(it.confidence * 100)}%</b>${it.confidence < 0.7 ? `<span class="chip warn">нужна проверка человеком</span>` : ""}</div>` : ""}
-      ${it.suggestion ? `<div class="coach"><b>${ic("bolt")} Как стоило ответить</b><div>${esc(it.suggestion)}</div></div>` : ""}
-      <div class="ev">
-        ${(it.evidence || []).length ? `<span class="muted">Доказательство:</span>${it.evidence.map((n) => `<button data-jump="${n}">${ic("target")} реплика ${n}</button>`).join("")}` : ""}
-        ${range ? `<span class="muted">Проверенный участок:</span><button data-jump="${range[0]}-${range[1]}" data-focus="${(it.evidence || [])[0] || range[0]}">реплики ${range[0]}–${range[1]}</button>` : ""}
+    return `<div class="crit ${isOpen ? "open" : ""} ${changed ? "changed" : ""}" data-c="${c.id}">
+      <button class="crit-head">${answerIcon(c, fin.answer)}
+        <span class="nm">${esc(c.name)}${low ? ` <span class="low" title="Модель не уверена — проверьте">?</span>` : ""}${openAppeal ? ` <span class="chip warn">апелляция</span>` : ""}</span>
+        <span class="pt">${changed ? `<s class="old">${esc(answerLabel(c, orig.answer))}</s>` : ""}${pts}</span>${ic("down", "i chev")}</button>
+      <div class="crit-body">
+        <p class="expl">${esc(it.explanation || "Модель не дала пояснения.")}</p>
+        ${it.quote ? `<blockquote class="quote" data-jump>«${esc(it.quote)}»${(it.evidence || [])[0] ? `<span>реплика #${it.evidence[0]}</span>` : ""}</blockquote>` : ""}
+        ${fin.answer === "na" ? `<div class="note"><b>Почему N/A:</b> ${esc(c.na_condition || "критерий неприменим")}. Вес ${c.weight} распределён между остальными критериями.</div>` : ""}
+        ${it.suggestion ? `<div class="coach"><b>${ic("bolt")} Как стоило ответить</b><div>${esc(it.suggestion)}</div></div>` : ""}
+        <div class="crit-actions">
+          ${(it.evidence || []).length || range ? `<button class="btn sm" data-jump>${ic("target")} Показать в диалоге${range && !(it.evidence || []).length ? ` (реплики ${range[0]}–${range[1]})` : ""}</button>` : ""}
+          ${openAppeal ? "" : `<button class="btn sm" data-appeal>${ic("scale")} Оспорить</button>`}
+          <span class="grow"></span>
+          ${it.confidence != null ? `<span class="conf ${low ? "low" : ""}" title="Уверенность модели">${low ? "нужна проверка · " : ""}уверенность ${Math.round(it.confidence * 100)}%</span>` : ""}
+        </div>
+        <details class="rule"><summary>Правило критерия${c.type !== "flag" ? ` · вес ${c.weight}` : ""}</summary><p>${esc(c.description)}${c.na_allowed ? `<br><b>N/A:</b> ${esc(c.na_condition)}` : ""}</p></details>
+        ${it.warning ? `<div class="note warn">⚠ ${esc(it.warning)}</div>` : ""}
+        ${appeals.map((a) => `<div class="note appeal"><b>Апелляция #${a.id}</b>${a.author ? ` · ${esc(a.author)}` : ""}: ${esc(a.comment)}
+          ${a.decision ? `<br><b>Решение:</b> ${a.decision.action === "change" ? `${esc(answerLabel(c, a.decision.old_answer))} → ${esc(answerLabel(c, a.decision.new_answer))}` : "оценка подтверждена"} — ${esc(a.decision.reason)}` : `<br><span class="muted">Ждёт решения проверяющего</span>`}</div>`).join("")}
+        ${openAppeal ? "" : `<div class="ap-form" hidden>
+          <textarea placeholder="Почему оценка неверна? Сошлитесь на номера реплик, например «#12 — оператор попрощался»."></textarea>
+          <div class="row"><input placeholder="Ваше имя (необязательно)" class="grow"><button class="btn sm ghost" data-cancel>Отмена</button><button class="btn sm pri" data-send>Отправить апелляцию</button></div></div>`}
       </div>
-      ${fin.answer === "na" ? `<div class="note"><b>Причина N/A:</b> ${esc(c.na_condition || "критерий неприменим")}</div>` : ""}
-      <div class="rule"><b>Правило:</b> ${esc(c.description)}</div>
-      ${it.warning ? `<div class="note warn">⚠ ${esc(it.warning)}</div>` : ""}
-      ${appeals.map((a) => `<div class="note appeal"><b>Апелляция #${a.id}</b>${a.author ? ` · ${esc(a.author)}` : ""}: ${esc(a.comment)}
-        ${a.decision ? `<br><b>Решение:</b> ${a.decision.action === "change" ? `изменено ${esc(answerLabel(c, a.decision.old_answer))} → ${esc(answerLabel(c, a.decision.new_answer))}` : "оценка подтверждена"} — ${esc(a.decision.reason)}${a.decision.reviewer ? ` (${esc(a.decision.reviewer)})` : ""}` : `<br><span class="muted">Ожидает решения проверяющего</span>`}</div>`).join("")}
-      ${open ? "" : `<div id="ap-form" hidden style="margin-top:10px">
-        <textarea placeholder="Почему оценка по критерию «${esc(c.name)}» неверна? Сошлитесь на номера реплик."></textarea>
-        <div class="row" style="margin-top:8px"><input placeholder="Ваше имя (необязательно)" class="grow"><button class="btn pri sm" id="ap-send">Подать апелляцию</button></div></div>`}
     </div>`;
   }
 

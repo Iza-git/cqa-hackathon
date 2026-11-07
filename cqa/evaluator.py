@@ -215,7 +215,7 @@ def mock_llm(record: dict, checklist: dict) -> tuple[dict, dict]:
         items.append({"criterion_id": c["id"], "answer": ans, "explanation": "Тестовая оценка (mock).",
                       "evidence": [ev] if ev else [], "checked_from": op[0] if op else 1, "checked_to": op[-1] if op else 1,
                       "quote": " ".join(tr[ev - 1]["text"].split()[:6]) if ev else "",
-                      "confidence": 0.55 if k == 2 else 0.9,
+                      "confidence": 0.55 if k == 2 and len(tr) % 3 == 0 else 0.9,  # заглушка: «спорные» только у части диалогов
                       "suggestion": "Уточните срок ответа и предложите дальнейшую помощь." if partial else ""})
     return {"criteria": items, "summary": "Тестовая оценка без LLM."}, {"model": "mock"}
 
