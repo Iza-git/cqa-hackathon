@@ -1,0 +1,242 @@
+/* CQA — оформление по макету design/CQA_design.html. Все стили внутри #cqa-root, классы с префиксом cqa-. */
+#cqa-root {
+  --cqa-text: #fff; --cqa-muted: #A7B3AE; --cqa-soft: #D5DEDA;
+  --cqa-green: #3DEB8F; --cqa-green-2: #12B981; --cqa-teal: #2FD6B4; --cqa-mint: #A9F5DC;
+  --cqa-purple: #A855F7; --cqa-pink: #E04FD0; --cqa-amber: #FFC24B; --cqa-red: #FF5470; --cqa-blue: #7FB6FF;
+  --cqa-glass: rgba(255,255,255,.06); --cqa-glass-2: rgba(255,255,255,.035); --cqa-edge: rgba(255,255,255,.11);
+  --cqa-grad-go: linear-gradient(95deg,#0FB57C,#38E39B);
+  --cqa-grad-dis: linear-gradient(95deg,#B14DF5,#E04FD0);
+  --cqa-grad-hero: linear-gradient(110deg,#0FA57A,#35CFA3 58%,#A9F5DC);
+  position: fixed; inset: 0; display: flex; color: var(--cqa-text);
+  font: 15px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1px 1px at 12% 22%,#fff8,transparent),radial-gradient(1.5px 1.5px at 38% 8%,#fff6,transparent),
+    radial-gradient(1px 1px at 63% 18%,#fff7,transparent),radial-gradient(1.5px 1.5px at 88% 40%,#fff5,transparent),
+    radial-gradient(1px 1px at 72% 82%,#fff6,transparent),radial-gradient(1.5px 1.5px at 30% 90%,#fff5,transparent),
+    radial-gradient(760px 480px at 92% -8%,rgba(18,185,129,.5),transparent 70%),
+    radial-gradient(640px 520px at 8% 108%,rgba(139,62,247,.34),transparent 70%),
+    radial-gradient(520px 420px at 58% 112%,rgba(47,214,180,.2),transparent 70%),#04100C;
+}
+#cqa-root *, #cqa-root *::before, #cqa-root *::after { box-sizing: border-box; }
+#cqa-root h1, #cqa-root h2, #cqa-root h3, #cqa-root p { margin: 0; }
+#cqa-root button, #cqa-root input, #cqa-root select, #cqa-root textarea { font: inherit; color: inherit; }
+#cqa-root a { color: inherit; }
+#cqa-root ::-webkit-scrollbar { width: 8px; height: 8px; }
+#cqa-root ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); border-radius: 8px; }
+:is(#cqa-root) a:focus-visible, :is(#cqa-root) button:focus-visible, :is(#cqa-root) input:focus-visible,
+:is(#cqa-root) select:focus-visible, :is(#cqa-root) textarea:focus-visible { outline: 2px solid var(--cqa-green); outline-offset: 2px; }
+
+/* Объёмная плитка-иконка */
+.cqa-tile3d, .cqa-nav svg, .cqa-mark {
+  border-radius: 12px; display: flex; align-items: center; justify-content: center; flex: none;
+  box-shadow: 0 6px 14px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6), inset 0 -3px 6px rgba(0,0,0,.18);
+}
+
+/* Меню */
+.cqa-side { width: 224px; flex: none; padding: 24px 14px; display: flex; flex-direction: column; background: rgba(0,0,0,.28); border-right: 1px solid var(--cqa-edge); }
+.cqa-logo { display: flex; align-items: center; gap: 11px; font-size: 25px; font-weight: 800; padding: 0 8px 24px; }
+.cqa-logo::before { content: "✓"; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+  background: linear-gradient(145deg,#6CF5B1,#0F9D6E); box-shadow: 0 8px 22px rgba(18,185,129,.55), inset 0 1px 1px #fff9; }
+.cqa-nav { display: flex; flex-direction: column; gap: 6px; }
+.cqa-nav a { display: flex; gap: 12px; align-items: center; padding: 9px; border-radius: 17px; color: var(--cqa-soft); text-decoration: none; font-weight: 600; border: 1px solid transparent;
+  transition: background-color .15s, border-color .15s; }
+.cqa-nav a:hover { background: var(--cqa-glass); }
+.cqa-nav a.cqa-active { background: linear-gradient(100deg,rgba(61,235,143,.24),rgba(61,235,143,.05)); border-color: rgba(61,235,143,.42); color: #fff; box-shadow: 0 8px 26px rgba(18,185,129,.24); }
+.cqa-nav svg { width: 38px; height: 38px; padding: 8px; color: #fff; stroke-width: 2.2; }
+.cqa-nav a:nth-child(1) svg { background: linear-gradient(145deg,#6CF5B1,#0F9D6E); }
+.cqa-nav a:nth-child(2) svg { background: linear-gradient(145deg,#7FF0E0,#149C9A); }
+.cqa-nav a:nth-child(3) svg { background: linear-gradient(145deg,#D08CFF,#7B2FF0); }
+.cqa-nav a:nth-child(4) svg { background: linear-gradient(145deg,#FFD978,#F0902B); }
+.cqa-role { margin-top: auto; padding: 12px; border-radius: 18px; background: var(--cqa-glass); border: 1px solid var(--cqa-edge); font-size: 12px; color: var(--cqa-muted); }
+.cqa-role select { width: 100%; margin-top: 6px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--cqa-edge); background: rgba(0,0,0,.3); color: #fff; font-weight: 700; font-size: 14px; }
+.cqa-role select option, #cqa-root select option { background: #0B1F18; color: #fff; }
+.cqa-demo-note { margin-top: 10px; padding: 9px 11px; border-radius: 14px; background: rgba(255,194,75,.11); border: 1px solid rgba(255,194,75,.32); font-size: 11px; color: #FFE3A3; }
+
+/* Основная область */
+.cqa-main { flex: 1; min-width: 0; overflow: auto; padding: 22px 28px; }
+.cqa-title { font-size: 33px; font-weight: 800; line-height: 1.1; letter-spacing: -.3px; }
+.cqa-sub { margin-top: 7px; display: inline-block; padding: 3px 11px; border-radius: 99px; background: var(--cqa-glass); border: 1px solid var(--cqa-edge); font-size: 13px; color: #DDE5E1; }
+.cqa-head { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.cqa-card { background: var(--cqa-glass); border: 1px solid var(--cqa-edge); border-radius: 26px; padding: 18px 20px; backdrop-filter: blur(18px); box-shadow: 0 18px 40px rgba(0,0,0,.25); }
+.cqa-card-title { font-size: 18px; font-weight: 700; margin-bottom: 11px; }
+.cqa-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.cqa-grow { flex: 1; min-width: 0; }
+.cqa-stack { display: flex; flex-direction: column; gap: 12px; }
+.cqa-muted { color: var(--cqa-muted); }
+.cqa-small { font-size: 12px; }
+.cqa-sep { width: 1px; height: 28px; background: var(--cqa-edge); }
+
+/* Кнопки и поля */
+.cqa-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 17px; border-radius: 99px; border: 1px solid var(--cqa-edge);
+  background: var(--cqa-glass); cursor: pointer; font-weight: 700; white-space: nowrap; color: #fff; text-decoration: none;
+  transition: background-color .15s, scale .15s, box-shadow .15s; }
+.cqa-btn:hover { background: rgba(255,255,255,.12); }
+.cqa-btn:active:not(:disabled) { scale: .96; }
+.cqa-btn:disabled { opacity: .5; cursor: not-allowed; }
+.cqa-primary { background: var(--cqa-grad-go); border: 0; color: #04261A !important; box-shadow: 0 10px 26px rgba(18,185,129,.45); }
+.cqa-primary:hover { background: linear-gradient(95deg,#12C487,#4CF0A8); }
+.cqa-btn-dispute { background: var(--cqa-grad-dis); border: 0; box-shadow: 0 10px 26px rgba(177,77,245,.38); }
+.cqa-btn-dispute:hover { background: linear-gradient(95deg,#BD60F7,#E866D9); }
+.cqa-danger { color: var(--cqa-red) !important; }
+.cqa-input { padding: 9px 14px; border: 1px solid var(--cqa-edge); border-radius: 99px; background: var(--cqa-glass); color: #fff; max-width: 100%; font-weight: 600; }
+.cqa-input::placeholder { color: var(--cqa-muted); font-weight: 400; }
+.cqa-input:disabled { opacity: .6; }
+textarea.cqa-input { width: 100%; resize: vertical; min-height: 72px; border-radius: 16px; font-weight: 400; }
+.cqa-field { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--cqa-muted); font-weight: 600; }
+.cqa-field .cqa-input { color: #fff; font-size: 14px; border-radius: 14px; }
+.cqa-check { display: inline-flex; gap: 7px; align-items: center; cursor: pointer; font-weight: 600; }
+.cqa-check input { accent-color: var(--cqa-green); width: 16px; height: 16px; }
+
+/* Метки */
+.cqa-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; background: rgba(255,255,255,.1); color: var(--cqa-soft); white-space: nowrap; }
+.cqa-tag-ok { background: rgba(61,235,143,.17); color: var(--cqa-green); }
+.cqa-tag-warn { background: rgba(255,194,75,.18); color: var(--cqa-amber); }
+.cqa-tag-err { background: linear-gradient(95deg,#FF5470,#FF2D6B); color: #fff; box-shadow: 0 4px 14px rgba(255,84,112,.5); }
+
+/* Баннер и плитки (Диалоги) */
+.cqa-banner { border-radius: 26px; padding: 21px 28px; margin-bottom: 14px; background: linear-gradient(105deg,#0E9F76,#3DD3A8 62%,#B4F6E0);
+  display: flex; justify-content: space-between; align-items: center; gap: 20px; position: relative; overflow: hidden; box-shadow: 0 16px 38px rgba(18,185,129,.35); color: #fff; }
+.cqa-banner::after { content: ""; position: absolute; right: -40px; top: -60px; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#ffffffa0,#ffffff18 60%,transparent 70%); pointer-events: none; }
+.cqa-banner h2 { font-size: 27px; font-weight: 800; margin-bottom: 3px; }
+#cqa-root .cqa-banner-cta { position: relative; z-index: 1; padding: 11px 22px; border-radius: 99px; background: #fff; color: #0B7A5A; font-weight: 800; border: 0; cursor: pointer; margin-top: 10px; transition: scale .15s; }
+.cqa-banner-cta:active { scale: .96; }
+.cqa-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 14px; }
+.cqa-stat { display: flex; align-items: center; gap: 14px; padding: 15px 17px; }
+.cqa-stat .cqa-tile3d { width: 46px; height: 46px; border-radius: 15px; font-size: 20px; }
+.cqa-stat b { font-size: 27px; display: block; line-height: 1.05; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cqa-stat span { color: var(--cqa-muted); font-size: 13px; }
+.cqa-g { background: linear-gradient(145deg,#6CF5B1,#0F9D6E); } .cqa-t { background: linear-gradient(145deg,#7FF0E0,#149C9A); }
+.cqa-p { background: linear-gradient(145deg,#D08CFF,#7B2FF0); } .cqa-a { background: linear-gradient(145deg,#FFD978,#F0902B); }
+.cqa-r { background: linear-gradient(145deg,#FF9AA8,#E32950); } .cqa-b { background: linear-gradient(145deg,#9DCBFF,#2F73E0); }
+
+/* Таблица: строки-плашки */
+.cqa-table-wrap { overflow-x: auto; }
+.cqa-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
+.cqa-table th { text-align: left; font-size: 13px; font-weight: 600; color: var(--cqa-muted); padding: 2px 12px; white-space: nowrap; }
+.cqa-table td { padding: 10px 12px; white-space: nowrap; background: var(--cqa-glass-2); transition: background-color .15s; }
+.cqa-table td:first-child { border-radius: 17px 0 0 17px; }
+.cqa-table td:last-child { border-radius: 0 17px 17px 0; }
+.cqa-table tbody tr { cursor: pointer; }
+.cqa-table tbody tr:hover td { background: rgba(255,255,255,.08); }
+.cqa-table tbody tr.cqa-row-alert td { background: linear-gradient(90deg,rgba(255,84,112,.2),rgba(255,84,112,.06)); }
+.cqa-table td input[type=checkbox] { accent-color: var(--cqa-green); width: 16px; height: 16px; }
+.cqa-id { font-weight: 700; color: #fff; }
+.cqa-progress { height: 8px; background: rgba(255,255,255,.12); border-radius: 99px; overflow: hidden; }
+.cqa-progress > div { height: 100%; background: linear-gradient(90deg,#2FD6B4,#3DEB8F); transition: width .25s; }
+
+/* Плеер */
+.cqa-player { margin-bottom: 14px; }
+.cqa-track { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 8px; margin-bottom: 4px; font-weight: 700; font-size: 14px; }
+.cqa-lane { position: relative; height: 39px; border-radius: 10px; cursor: pointer; background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 2px, transparent 2px 5px); }
+.cqa-seg { position: absolute; top: 8px; bottom: 8px; border-radius: 4px; min-width: 3px; background: linear-gradient(180deg,#B27DFF,#7FB6FF); opacity: .9; }
+.cqa-lane-op .cqa-seg { background: linear-gradient(180deg,#3DEB8F,#2FD6B4); }
+.cqa-frag { position: absolute; top: -2px; bottom: -2px; background: rgba(255,194,75,.15); border: 1.5px solid var(--cqa-amber); border-radius: 12px; box-shadow: 0 0 22px rgba(255,194,75,.4); pointer-events: none; }
+.cqa-head-line { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #fff; box-shadow: 0 0 10px var(--cqa-green); pointer-events: none; }
+.cqa-controls { display: grid; grid-template-columns: 44px auto 1fr; gap: 14px; align-items: center; margin-top: 9px; }
+#cqa-root .cqa-play { width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer; font-size: 15px; padding-left: 3px; color: #04261A;
+  background: linear-gradient(145deg,#6CF5B1,#0F9D6E); box-shadow: 0 6px 20px rgba(18,185,129,.6); transition: scale .15s; }
+.cqa-play:active { scale: .96; }
+.cqa-controls .cqa-small { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+.cqa-controls input[type=range] { width: 100%; accent-color: var(--cqa-green); }
+
+/* Карточка диалога */
+.cqa-split { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; align-items: start; }
+.cqa-scroll { max-height: calc(100vh - 170px); overflow: auto; padding-right: 4px; }
+.cqa-has-player .cqa-scroll { max-height: calc(100vh - 360px); min-height: 320px; }
+
+/* Реплики как сообщения чата */
+.cqa-scroll[aria-label] { display: flex; flex-direction: column; gap: 9px; }
+.cqa-turn { max-width: 82%; padding: 10px 14px; border-radius: 18px 18px 18px 5px; background: rgba(255,255,255,.09); scroll-margin: 60px; transition: box-shadow .2s, background-color .2s; }
+.cqa-turn-meta { font-size: 12px; font-weight: 700; color: #C4D0CB; display: flex; gap: 8px; align-items: baseline; margin-bottom: 2px; }
+.cqa-turn-meta time { color: var(--cqa-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+.cqa-turn-operator { align-self: flex-end; border-radius: 18px 18px 5px 18px; background: linear-gradient(135deg,rgba(18,185,129,.5),rgba(47,214,180,.26)); }
+.cqa-turn-context { align-self: center; max-width: 92%; background: rgba(255,255,255,.035); color: var(--cqa-muted); font-size: 13px; border-radius: 14px; }
+.cqa-turn-range { box-shadow: 0 0 0 1.5px rgba(255,194,75,.55); }
+.cqa-turn-hl { background: linear-gradient(135deg,rgba(255,194,75,.42),rgba(255,140,60,.2)) !important; color: #fff; box-shadow: 0 0 0 1.5px var(--cqa-amber), 0 0 26px rgba(255,194,75,.4); }
+.cqa-turn-hl .cqa-turn-meta::after { content: "Доказательство"; font-size: 11px; font-weight: 800; color: #3A2600; background: var(--cqa-amber); padding: 1px 8px; border-radius: 99px; }
+.cqa-turn-playing { box-shadow: 0 0 0 1.5px var(--cqa-green), 0 0 18px rgba(61,235,143,.35); }
+
+/* Итог: бирюзовый блок с кольцом */
+.cqa-summary { display: flex; gap: 20px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; border-radius: 22px; padding: 15px 20px; position: relative; overflow: hidden;
+  background: var(--cqa-grad-hero); box-shadow: 0 12px 30px rgba(18,185,129,.35); color: #fff; }
+.cqa-summary::after { content: ""; position: absolute; right: -34px; top: -34px; width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#ffffffb0,#ffffff18 60%,transparent 70%); pointer-events: none; }
+.cqa-summary > * { position: relative; z-index: 1; }
+.cqa-summary .cqa-muted { color: rgba(255,255,255,.85); }
+.cqa-ring { position: relative; width: 112px; height: 112px; flex: none; }
+.cqa-ring svg { transform: rotate(-90deg); }
+.cqa-ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.cqa-ring-num { font-size: 30px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.cqa-section-row { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; font-size: 14px; }
+.cqa-section-row b { font-variant-numeric: tabular-nums; }
+
+.cqa-alert { padding: 11px 15px; border-radius: 16px; margin-bottom: 10px; font-weight: 600; }
+.cqa-alert-err { background: linear-gradient(95deg,rgba(255,84,112,.35),rgba(255,45,107,.15)); border: 1px solid rgba(255,84,112,.55); color: #fff; }
+.cqa-alert-warn { background: rgba(255,194,75,.11); border: 1px solid rgba(255,194,75,.32); color: #FFE3A3; }
+.cqa-alert-warn a { color: var(--cqa-amber); }
+.cqa-alert-ok { background: rgba(61,235,143,.13); border: 1px solid rgba(61,235,143,.4); color: var(--cqa-mint); }
+
+/* Критерии */
+.cqa-crit { border-top: 1px solid var(--cqa-edge); }
+.cqa-crit:first-of-type { border-top: 0; }
+.cqa-crit-head { width: 100%; display: grid; grid-template-columns: 32px 1fr auto; gap: 11px; align-items: center; padding: 9px 4px; border: 0; background: none; cursor: pointer; text-align: left; color: #fff; font-weight: 600; border-radius: 14px; }
+.cqa-crit-head:hover { background: var(--cqa-glass-2); }
+.cqa-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 15px; font-weight: 800; color: #fff; background: linear-gradient(145deg,#B8C4BF,#6E7C76); }
+.cqa-mark-ok { background: linear-gradient(145deg,#6CF5B1,#0F9D6E); }
+.cqa-mark-part { background: linear-gradient(145deg,#FFD978,#F0902B); }
+.cqa-mark-bad { background: linear-gradient(145deg,#FF9AA8,#E32950); }
+.cqa-points { font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cqa-crit-body { padding: 4px 4px 14px 47px; display: flex; flex-direction: column; gap: 10px; }
+.cqa-crit-body > div:nth-child(2) { padding: 10px 14px; border-radius: 16px; background: rgba(255,194,75,.11); border: 1px solid rgba(255,194,75,.32); }
+.cqa-crit-body > div:nth-child(2) b { color: var(--cqa-amber); }
+.cqa-quote { border-left: 3px solid var(--cqa-amber); padding: 6px 12px; border-radius: 0 12px 12px 0; background: rgba(255,255,255,.04); font-style: italic; }
+.cqa-quote .cqa-small { font-style: normal; }
+.cqa-history { background: linear-gradient(100deg,rgba(168,85,247,.2),rgba(224,79,208,.06)); border: 1px solid rgba(200,120,255,.32); border-radius: 16px; padding: 10px 14px; font-size: 13px; }
+
+/* Списки слева (чек-листы, апелляции) */
+.cqa-master { display: grid; grid-template-columns: 300px minmax(0,1fr); gap: 14px; align-items: start; }
+.cqa-list-item { display: block; width: 100%; padding: 12px 13px; margin-bottom: 7px; text-align: left; border: 0; border-radius: 18px; background: var(--cqa-glass-2); cursor: pointer; color: #fff; transition: background-color .15s; }
+.cqa-list-item:hover { background: rgba(255,255,255,.08); }
+.cqa-list-item.cqa-active { background: linear-gradient(100deg,rgba(168,85,247,.28),rgba(224,79,208,.08)); box-shadow: inset 0 0 0 1.5px rgba(200,120,255,.65); }
+.cqa-list-item .cqa-tag { margin-top: 5px; }
+
+/* Редактор чек-листа */
+.cqa-editor-crit { border: 1px solid var(--cqa-edge); border-radius: 22px; padding: 16px; display: grid; gap: 10px; background: var(--cqa-glass); backdrop-filter: blur(18px); }
+.cqa-editor-grid { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,2fr) 130px 110px; gap: 10px; }
+.cqa-step { display: grid; grid-template-columns: 90px 1fr 44px; gap: 6px; margin-bottom: 6px; }
+
+/* Аналитика */
+.cqa-tiles { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 12px; margin-bottom: 14px; }
+.cqa-tile-num { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.cqa-tiles .cqa-card:nth-child(1) .cqa-tile-num { color: var(--cqa-green); }
+.cqa-tiles .cqa-card:nth-child(2) .cqa-tile-num { color: var(--cqa-teal); }
+.cqa-tiles .cqa-card:nth-child(3) .cqa-tile-num { color: var(--cqa-red); }
+.cqa-tiles .cqa-card:nth-child(4) .cqa-tile-num { color: var(--cqa-amber); }
+.cqa-bar-row { display: grid; grid-template-columns: minmax(120px,230px) 1fr 62px; gap: 12px; align-items: center; padding: 7px 0; }
+.cqa-bar-row b { font-variant-numeric: tabular-nums; }
+.cqa-bar { height: 12px; background: rgba(255,255,255,.12); border-radius: 9px; overflow: hidden; }
+.cqa-bar > div { height: 100%; border-radius: 9px; background: linear-gradient(90deg,#2FD6B4,#3DEB8F); }
+.cqa-two { display: grid; grid-template-columns: repeat(auto-fit,minmax(340px,1fr)); gap: 14px; }
+
+.cqa-toast { position: absolute; right: 24px; bottom: 24px; padding: 13px 18px; border-radius: 18px; background: rgba(10,30,22,.92); border: 1px solid rgba(61,235,143,.4); color: #fff;
+  box-shadow: 0 12px 34px rgba(0,0,0,.45); max-width: 420px; z-index: 5; font-weight: 600; backdrop-filter: blur(12px); }
+.cqa-empty { padding: 30px; text-align: center; color: var(--cqa-muted); }
+
+@media (max-width: 1100px) {
+  .cqa-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 1000px) {
+  #cqa-root { flex-direction: column; }
+  .cqa-side { width: 100%; padding: 10px 12px; }
+  .cqa-logo { padding: 0 6px 8px; font-size: 20px; }
+  .cqa-nav { flex-direction: row; overflow-x: auto; }
+  .cqa-role { margin-top: 8px; }
+  .cqa-demo-note { display: none; }
+  .cqa-main { padding: 14px; }
+  .cqa-split, .cqa-master { grid-template-columns: minmax(0,1fr); }
+  .cqa-scroll, .cqa-has-player .cqa-scroll { max-height: none; }
+  .cqa-editor-grid { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #cqa-root *, #cqa-root *::before, #cqa-root *::after { transition-duration: .01ms !important; }
+}

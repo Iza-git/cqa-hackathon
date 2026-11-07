@@ -33,10 +33,12 @@ def load_env(path: Path):
 load_env(ROOT / ".env")
 
 from cqa.evaluator import LLMError, evaluate  # noqa: E402
+from cqa.api_v2 import V2, ApiError as V2Error  # noqa: E402
 from cqa.store import Store  # noqa: E402
 
 store = Store(ROOT / os.environ.get("CQA_DB", "cqa.db"))
 jobs: dict[str, dict] = {}
+v2 = V2(store.db, store.lock, lambda g: fetch_group(g))
 eval_lock = threading.Semaphore(int(os.environ.get("CQA_PARALLEL", "2")))
 
 
@@ -177,7 +179,7 @@ def route(method: str, path: str, query: dict, body: dict):
     p = path.rstrip("/")
     if method == "GET" and p == "/api/config":
         return {"llm": "mock" if os.environ.get("CQA_LLM") == "mock" else "gemini",
-                "model": os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+                "model": os.environ.get("GEMINI_MODEL", "gemini-3.6-flash"),
                 "has_key": bool(os.environ.get("GEMINI_API_KEY")),
                 "has_api_url": bool(os.environ.get("CQA_API_URL"))}
     if method == "GET" and p == "/api/groups":
@@ -337,8 +339,14 @@ def export_csv(query: dict) -> str:
 
 
 class Handler(SimpleHTTPRequestHandler):
+    # Сайт команды (frontend/) на «/», прежний интерфейс (web/) на «/old/».
     def __init__(self, *a, **kw):
-        super().__init__(*a, directory=str(ROOT / "web"), **kw)
+        super().__init__(*a, directory=str(ROOT / "frontend"), **kw)
+
+    def translate_path(self, path):
+        if path.startswith("/old/") or path == "/old":
+            return str(ROOT / "web") + (urllib.parse.urlsplit(path).path[4:] or "/")
+        return super().translate_path(path)
 
     def log_message(self, fmt, *args):
         if "/api/" in str(args[0] if args else ""):
@@ -379,20 +387,52 @@ class Handler(SimpleHTTPRequestHandler):
             traceback.print_exc()
             self.send_json(500, {"error": f"{type(e).__name__}: {e}"})
 
+    def handle_v2(self, method):
+        """API по контракту сайта: /v2/api/... (frontend/config.js: CQA_API_BASE = "/v2")."""
+        parts = urllib.parse.urlsplit(self.path)
+        path = parts.path[len("/v2/api"):]
+        try:
+            if method == "GET" and path.startswith("/audio/"):
+                # ссылка организаторов ведёт на страницу плеера, а не на файл — отправляем туда
+                _, _, g, cid = path.split("/", 3)
+                self.send_response(302)
+                self.send_header("Location", v2.audio_url(urllib.parse.unquote(g), urllib.parse.unquote(cid)))
+                self.end_headers()
+                return
+            n = int(self.headers.get("Content-Length") or 0)
+            body = json.loads(self.rfile.read(n) or b"{}") if n else {}
+            self.send_json(200, v2.route(method, path, dict(urllib.parse.parse_qsl(parts.query)), body))
+        except (V2Error, ApiError) as e:
+            self.send_json(e.code, {"detail": str(e)})
+        except json.JSONDecodeError:
+            self.send_json(400, {"detail": "Некорректный JSON"})
+        except Exception as e:  # noqa: BLE001
+            traceback.print_exc()
+            self.send_json(500, {"detail": f"{type(e).__name__}: {e}"})
+
     def do_GET(self):
+        if self.path.startswith("/v2/api/"):
+            return self.handle_v2("GET")
         if self.path.startswith("/api/"):
             return self.handle_api("GET")
         return super().do_GET()
 
     def do_POST(self):
+        if self.path.startswith("/v2/api/"):
+            return self.handle_v2("POST")
         if self.path.startswith("/api/"):
             return self.handle_api("POST")
+        self.send_json(404, {"error": "Не найдено"})
+
+    def do_PUT(self):
+        if self.path.startswith("/v2/api/"):
+            return self.handle_v2("PUT")
         self.send_json(404, {"error": "Не найдено"})
 
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
@@ -407,5 +447,13 @@ if __name__ == "__main__":
             print("Загружен DEV:", store.upsert_dialogs("DEV", records), "диалогов", flush=True)
         except Exception as e:  # noqa: BLE001
             print("Не удалось загрузить DEV:", e, flush=True)
-    print(f"CQA: http://localhost:{port}", flush=True)
+    if not v2.q("SELECT 1 FROM v2_conversations LIMIT 1"):
+        local = ROOT / "data" / "dev.json"
+        try:
+            recs = json.loads(local.read_text(encoding="utf-8"))["data"]["records"] if local.exists() else fetch_group("DEV")
+            print("Сайт: загружен DEV:", v2.import_records("DEV", recs), "диалогов", flush=True)
+            print("Сайт: перенесено готовых оценок:", v2.migrate_from(store), flush=True)
+        except Exception as e:  # noqa: BLE001
+            print("Сайт: не удалось загрузить DEV:", e, flush=True)
+    print(f"CQA: http://localhost:{port}  (прежний интерфейс: /old/)", flush=True)
     ThreadingHTTPServer((os.environ.get("HOST", "127.0.0.1"), port), Handler).serve_forever()

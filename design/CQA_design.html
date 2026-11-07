@@ -1,0 +1,147 @@
+<!doctype html>
+<!-- CQA: макет дизайна для разработчиков. Статичная страница: сервера и ИИ нет, все данные условные.
+     Экраны: #dialogs, #analysis, #checklists, #appeals, #analytics. Рабочая ширина: 1440 x 900. -->
+<html lang="ru"><head><meta charset="utf-8"><title>CQA: примеры дизайна</title>
+<style>
+:root{--text:#fff;--muted:#A7B3AE;--green:#3DEB8F;--green2:#12B981;--teal:#2FD6B4;--mint:#A9F5DC;--purple:#A855F7;--pink:#E04FD0;--amber:#FFC24B;--red:#FF5470;--blue:#5AA9FF;--glass:rgba(255,255,255,.06);--edge:rgba(255,255,255,.11)}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{color:var(--text);font:15px/1.4 "Segoe UI",system-ui,sans-serif;display:flex;overflow:hidden;background:
+radial-gradient(1px 1px at 12% 22%,#fff8,transparent),radial-gradient(1.5px 1.5px at 38% 8%,#fff6,transparent),radial-gradient(1px 1px at 63% 18%,#fff7,transparent),radial-gradient(1.5px 1.5px at 88% 40%,#fff5,transparent),radial-gradient(1px 1px at 72% 82%,#fff6,transparent),radial-gradient(1.5px 1.5px at 30% 90%,#fff5,transparent),
+radial-gradient(760px 480px at 92% -8%,rgba(18,185,129,.5),transparent 70%),radial-gradient(640px 520px at 8% 108%,rgba(139,62,247,.34),transparent 70%),radial-gradient(520px 420px at 58% 112%,rgba(47,214,180,.2),transparent 70%),#04100C}
+.side{width:224px;flex:none;padding:24px 14px;display:flex;flex-direction:column;background:rgba(0,0,0,.28);border-right:1px solid var(--edge)}
+.logo{display:flex;align-items:center;gap:11px;font-size:25px;font-weight:800;padding:0 8px 24px}
+.logo i{width:38px;height:38px;border-radius:12px;background:linear-gradient(145deg,#6CF5B1,#0F9D6E);box-shadow:0 8px 22px rgba(18,185,129,.55),inset 0 1px 1px #fff9;display:flex;align-items:center;justify-content:center}
+.nav a{display:flex;gap:12px;align-items:center;padding:9px;border-radius:17px;color:#D5DEDA;font-weight:600;margin-bottom:6px;border:1px solid transparent}
+.nav a.on{background:linear-gradient(100deg,rgba(61,235,143,.24),rgba(61,235,143,.05));border-color:rgba(61,235,143,.42);color:#fff;box-shadow:0 8px 26px rgba(18,185,129,.24)}
+.tile3d{width:38px;height:38px;flex:none;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 1px 1px rgba(255,255,255,.6),inset 0 -3px 6px rgba(0,0,0,.18)}
+.tile3d svg{width:21px;height:21px}
+.g{background:linear-gradient(145deg,#6CF5B1,#0F9D6E)}.t{background:linear-gradient(145deg,#7FF0E0,#149C9A)}.p{background:linear-gradient(145deg,#D08CFF,#7B2FF0)}.a{background:linear-gradient(145deg,#FFD978,#F0902B)}.r{background:linear-gradient(145deg,#FF9AA8,#E32950)}.b{background:linear-gradient(145deg,#9DCBFF,#2F73E0)}
+.role{margin-top:auto;padding:12px;border-radius:18px;background:var(--glass);border:1px solid var(--edge);display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.role b{display:block;color:#fff;font-size:14px}
+.main{flex:1;min-width:0;padding:22px 28px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px}
+h1{font-size:33px;font-weight:800;line-height:1.1;letter-spacing:-.3px}
+.chips{display:flex;gap:7px;margin-top:7px}
+.chip{padding:3px 11px;border-radius:99px;background:var(--glass);border:1px solid var(--edge);font-size:13px;color:#DDE5E1}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:10px 17px;border-radius:99px;font-weight:700;white-space:nowrap;background:var(--glass);border:1px solid var(--edge)}
+.grad{background:linear-gradient(95deg,#B14DF5,#E04FD0);border:0;box-shadow:0 8px 24px rgba(177,77,245,.45)}
+.card{background:var(--glass);border:1px solid var(--edge);border-radius:26px;padding:18px 20px;backdrop-filter:blur(18px);box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.card h2{font-size:18px;font-weight:700;margin-bottom:11px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:99px;font-weight:700;white-space:nowrap;flex:1}
+.go{background:linear-gradient(95deg,#0FB57C,#38E39B);color:#04261A;box-shadow:0 10px 26px rgba(18,185,129,.45)}
+.dis{background:linear-gradient(95deg,#B14DF5,#E04FD0);box-shadow:0 10px 26px rgba(177,77,245,.38)}
+/* Плеер */
+.pw{position:relative}
+.track{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:8px;font-weight:700;font-size:14px;height:41px}
+.who{display:flex;align-items:center;gap:7px}.dot{width:9px;height:9px;border-radius:50%}
+.wave{height:39px;display:flex;align-items:center;gap:2px;overflow:hidden}.wave i{flex:1;border-radius:3px;min-width:1px}
+.frag{position:absolute;top:-2px;bottom:-2px;left:calc(104px + (100% - 104px)*.35);width:calc((100% - 104px)*.13);background:rgba(255,194,75,.15);border:1.5px solid var(--amber);border-radius:12px;box-shadow:0 0 22px rgba(255,194,75,.4)}
+.ctl{display:flex;align-items:center;gap:14px;margin-top:9px}
+.play{width:44px;height:44px;border-radius:50%;background:linear-gradient(145deg,#6CF5B1,#0F9D6E);display:flex;align-items:center;justify-content:center;padding-left:3px;color:#04261A;font-size:15px;box-shadow:0 6px 20px rgba(18,185,129,.6)}
+.prog{flex:1;height:6px;border-radius:9px;background:rgba(255,255,255,.15);position:relative}
+.prog b{position:absolute;inset:0 65% 0 0;background:linear-gradient(90deg,#2FD6B4,#3DEB8F);border-radius:9px}
+.prog u{position:absolute;left:35%;top:-6px;width:18px;height:18px;border-radius:50%;background:#fff;margin-left:-9px;box-shadow:0 0 14px var(--green)}
+/* Чат */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0}
+.msg{display:flex;gap:9px;margin-bottom:11px;align-items:flex-end}
+.msg.me{flex-direction:row-reverse}
+.av{width:32px;height:32px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;box-shadow:inset 0 1px 1px #fff8}
+.bub{padding:10px 14px;border-radius:18px 18px 18px 5px;background:rgba(255,255,255,.09);max-width:82%}
+.msg.me .bub{border-radius:18px 18px 5px 18px;background:linear-gradient(135deg,rgba(18,185,129,.5),rgba(47,214,180,.26))}
+.bub small{display:block;font-size:12px;color:#C4D0CB;margin-bottom:1px}
+.msg.hl .bub{background:linear-gradient(135deg,rgba(255,194,75,.42),rgba(255,140,60,.2));box-shadow:0 0 0 1.5px var(--amber),0 0 26px rgba(255,194,75,.4)}
+.ev{display:inline-block;font-size:11px;font-weight:800;color:#3A2600;background:var(--amber);padding:1px 8px;border-radius:99px;margin-left:6px}
+/* Счёт */
+.hero{border-radius:22px;padding:15px 20px;display:flex;align-items:center;gap:20px;background:linear-gradient(110deg,#0FA57A,#35CFA3 58%,#A9F5DC);position:relative;overflow:hidden;box-shadow:0 12px 30px rgba(18,185,129,.35)}
+.hero::after{content:"";position:absolute;right:-34px;top:-34px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffffb0,#ffffff18 60%,transparent 70%)}
+.ring{position:relative;width:108px;height:108px;flex:none}.ring svg{transform:rotate(-90deg)}
+.ring div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring b{font-size:30px;line-height:1;font-weight:800}.ring span{font-size:12px;opacity:.9}
+.hero h3{font-size:22px;font-weight:800;line-height:1.15}.hero p{opacity:.95;font-size:14px;margin-top:3px}
+.crit{display:grid;grid-template-columns:32px 1fr 74px;gap:11px;align-items:center;padding:7px 0}
+.crit .tile3d{width:32px;height:32px;border-radius:10px;font-weight:800;color:#fff;font-size:15px}
+.line{height:6px;background:rgba(255,255,255,.12);border-radius:9px;margin-top:5px;overflow:hidden}.line i{display:block;height:100%;border-radius:9px}
+.pts{font-weight:800;text-align:right}.pts span{color:var(--muted);font-weight:500;font-size:13px}
+.why{padding:10px 14px;border-radius:16px;background:rgba(255,194,75,.11);border:1px solid rgba(255,194,75,.32);margin:7px 0 11px}.why b{color:var(--amber)}
+.acts{display:flex;gap:10px}
+/* Диалоги */
+.banner{border-radius:26px;padding:21px 28px;background:linear-gradient(105deg,#0E9F76,#3DD3A8 62%,#B4F6E0);display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;box-shadow:0 16px 38px rgba(18,185,129,.35)}
+.banner h2{font-size:27px;font-weight:800;margin-bottom:3px}.banner .cta{padding:11px 22px;border-radius:99px;background:#fff;color:#0B7A5A;font-weight:800;display:inline-block;margin-top:10px}
+.art{position:absolute;right:30px;top:-6px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.st{display:flex;align-items:center;gap:14px;padding:15px 17px}.st b{font-size:27px;display:block;line-height:1.05;font-weight:800}.st span{color:var(--muted);font-size:13px}.st .tile3d{width:46px;height:46px;border-radius:15px}.st .tile3d svg{width:25px;height:25px}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:9px}
+.f{padding:8px 15px;border-radius:99px;background:var(--glass);border:1px solid var(--edge);font-weight:600;font-size:14px}
+.row{display:grid;grid-template-columns:44px 1.5fr .5fr .55fr 1.05fr .85fr .8fr;gap:10px;align-items:center;padding:7px 12px;border-radius:17px;margin-bottom:4px;background:rgba(255,255,255,.035)}
+.row.head{background:none;color:var(--muted);font-size:13px;padding-block:1px}
+.row.alert{background:linear-gradient(90deg,rgba(255,84,112,.2),rgba(255,84,112,.03));box-shadow:inset 0 0 0 1px rgba(255,84,112,.35)}
+.row .tile3d{width:36px;height:36px;border-radius:11px}.row .tile3d svg{width:20px;height:20px}
+.tag{display:inline-block;padding:3px 12px;border-radius:99px;font-size:13px;font-weight:700;background:rgba(61,235,143,.17);color:var(--green)}
+.tag.w{background:rgba(255,194,75,.18);color:var(--amber)}.tag.x{background:linear-gradient(95deg,#FF5470,#FF2D6B);color:#fff;box-shadow:0 4px 14px rgba(255,84,112,.5)}
+.sc{display:flex;align-items:center;gap:8px;font-weight:800}.sc i{width:44px;height:6px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden;display:block}.sc i u{display:block;height:100%;border-radius:9px}
+/* Апелляции */
+.ap{display:grid;grid-template-columns:304px 1fr;gap:14px;flex:1;min-height:0}
+.item{padding:12px 13px;border-radius:18px;margin-bottom:7px;display:flex;gap:11px;align-items:center}
+.item.on{background:linear-gradient(100deg,rgba(168,85,247,.28),rgba(224,79,208,.08));box-shadow:inset 0 0 0 1.5px rgba(200,120,255,.65)}
+.item small{color:var(--muted);display:block}
+.flow{display:grid;grid-template-columns:1fr 32px 1fr;align-items:center;gap:8px;margin-bottom:11px}
+.fbox{border-radius:18px;padding:12px 16px;background:rgba(255,255,255,.07)}.fbox span{font-size:13px;color:#D5DEDA;display:block}.fbox b{font-size:25px;font-weight:800}
+.fbox.new{background:linear-gradient(110deg,#0FA57A,#35CFA3);box-shadow:0 10px 24px rgba(18,185,129,.35)}
+.cmt{border-radius:16px;padding:10px 14px;margin-bottom:10px;background:linear-gradient(100deg,rgba(168,85,247,.2),rgba(224,79,208,.06));border:1px solid rgba(200,120,255,.32)}
+.seg{display:flex;background:rgba(255,255,255,.08);border-radius:99px;padding:4px;margin-bottom:9px;width:330px}.seg b{flex:1;text-align:center;padding:8px;border-radius:99px}.seg b.on{background:linear-gradient(95deg,#0FB57C,#38E39B);color:#04261A}
+.ta{background:rgba(255,255,255,.07);border-radius:16px;padding:10px 14px;color:#C4D0CB;margin-bottom:10px}
+a{color:inherit;text-decoration:none}.row:not(.head){cursor:pointer}
+/* Чек-листы */
+.cl{display:grid;grid-template-columns:270px 1fr;gap:14px;flex:1;min-height:0}
+.cr{display:grid;grid-template-columns:32px 1.6fr .75fr .45fr .4fr;gap:10px;align-items:center;padding:6px 12px;border-radius:15px;margin-bottom:4px;background:rgba(255,255,255,.035)}
+.cr.head{background:none;color:var(--muted);font-size:13px;padding-block:0}
+.cr .tile3d{width:30px;height:30px;border-radius:10px;font-weight:800}
+.cr.open{background:linear-gradient(100deg,rgba(61,235,143,.16),rgba(61,235,143,.03));box-shadow:inset 0 0 0 1px rgba(61,235,143,.42)}
+.steps{display:flex;gap:7px;margin:3px 0 7px 54px}.steps span{padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.08);font-size:13px;font-weight:600}
+/* Аналитика */
+.an{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;flex:1;min-height:0}
+.bg{display:grid;grid-template-columns:230px 1fr 62px;gap:12px;align-items:center;padding:7px 0}
+.bg .line{height:12px;margin:0}.bg b{text-align:right}
+.lang{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.lang div{border-radius:18px;padding:13px;text-align:center;box-shadow:inset 0 1px 1px #fff6}.lang b{display:block;font-size:26px;font-weight:800}.lang span{font-size:13px}
+</style></head><body>
+<aside class="side"><div class="logo"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4.5 4.5L19 7"/></svg></i>CQA</div><nav class="nav" id="nav"></nav><div class="role" id="role"></div></aside>
+<main class="main" id="m"></main>
+<script>
+var s=location.hash.slice(1)||'analysis';
+function svg(d,c){return '<svg viewBox="0 0 24 24" fill="none" stroke="'+(c||'#fff')+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="'+d+'"/></svg>'}
+var I={chat:'M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z',check:'M5 4h14v16H5zM9 12l2.5 2.5L15.5 9',law:'M12 4v16M7 20h10M5 8h14M5 8l-3 6a3 3 0 0 0 6 0zM19 8l-3 6a3 3 0 0 0 6 0z',bars:'M5 20v-6M12 20V5M19 20v-10',phone:'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z',warn:'M12 3l10 18H2zM12 10v5M12 18v.5',star:'M12 3l2.7 5.8 6.3.8-4.6 4.3 1.2 6.2L12 17l-5.6 3.1 1.2-6.2L3 9.6l6.3-.8z',user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0'};
+var nav=[['analysis dialogs','Диалоги','chat','g'],['checklists','Чек-листы','check','t'],['appeals','Апелляции','law','p'],['analytics','Аналитика','bars','a']];
+document.getElementById('nav').innerHTML=nav.map(function(n){return '<a href="#'+n[0].split(' ').pop()+'" class="'+(n[0].split(' ').indexOf(s)>=0?'on':'')+'"><span class="tile3d '+n[3]+'">'+svg(I[n[2]])+'</span>'+n[1]+'</a>'}).join('');
+document.getElementById('role').innerHTML='<span class="tile3d '+(s==='appeals'?'p':'b')+'">'+svg(I.user)+'</span><div>Роль<b>'+(s==='appeals'?'Проверяющий':'Оператор')+'</b></div>';
+function wave(seed,c1,c2){var o='',x=seed;for(var i=0;i<140;i++){x=(x*9301+49297)%233280;var e=Math.abs(Math.sin(i/8+seed))*.7+.2,h=Math.max(4,Math.round((x/233280)*e*38));var c=i/140<.35?c2:i/140<.48?'#FFC24B':c1;o+='<i style="height:'+h+'px;background:'+c+';'+(i/140<.48?'':'opacity:.72')+'"></i>'}return '<div class="wave">'+o+'</div>'}
+function ring(v,txt){var r=47,l=2*Math.PI*r;return '<div class="ring"><svg width="108" height="108"><circle cx="54" cy="54" r="47" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="11"/><circle cx="54" cy="54" r="47" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+(l*v/100)+' '+l+'"/></svg><div><b>'+String(v).replace('.',',')+'</b><span>'+txt+'</span></div></div>'}
+function crit(ic,c,n,a,b,col){return '<div class="crit"><span class="tile3d '+c+'">'+ic+'</span><div>'+n+'<div class="line"><i style="width:'+(parseFloat(a.replace(',','.'))/b*100)+'%;background:'+col+'"></i></div></div><div class="pts">'+a+' <span>/ '+b+'</span></div></div>'}
+function msg(t,w,x,me,hl){return '<div class="msg '+(me?'me ':'')+(hl?'hl':'')+'"><span class="av '+(me?'g':'b')+'">'+w[0]+'</span><div class="bub"><small>'+t+' · '+w+(hl?'<span class="ev">Доказательство</span>':'')+'</small>'+x+'</div></div>'}
+var art='<svg class="art" width="300" height="140" viewBox="0 0 300 140"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#7DEBCB"/></linearGradient><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#D79BFF"/><stop offset="1" stop-color="#8A3DF0"/></linearGradient><linearGradient id="c" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE08A"/><stop offset="1" stop-color="#F59A2E"/></linearGradient></defs><rect x="70" y="30" width="150" height="84" rx="22" fill="url(#a)" opacity=".96"/><path d="M92 112l-6 22 28-20z" fill="#BDF3E1"/><rect x="92" y="52" width="92" height="9" rx="4.5" fill="#12B981"/><rect x="92" y="72" width="62" height="9" rx="4.5" fill="#6CD8B6"/><rect x="176" y="10" width="90" height="56" rx="18" fill="url(#b)"/><rect x="194" y="26" width="52" height="7" rx="3.5" fill="#fff" opacity=".9"/><rect x="194" y="42" width="34" height="7" rx="3.5" fill="#fff" opacity=".6"/><circle cx="244" cy="102" r="31" fill="url(#c)"/><path d="M231 102l9 9 17-18" stroke="#fff" stroke-width="6.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var V={
+analysis:function(){return '<div class="top"><div><h1>Анализ разговора</h1><div class="chips"><span class="chip">Звонок 024</span><span class="chip">Русский</span><span class="chip">06:33</span></div></div><a class="pill" href="#dialogs">← К списку</a></div>'+
+'<div class="card"><div class="pw"><div class="frag"></div><div class="track"><span class="who"><i class="dot" style="background:#7FB6FF"></i>Клиент</span>'+wave(3,'#7FB6FF','#B27DFF')+'</div><div class="track"><span class="who"><i class="dot" style="background:#3DEB8F"></i>Оператор</span>'+wave(7,'#3DEB8F','#2FD6B4')+'</div></div><div class="ctl"><div class="play">▶</div><div style="font-weight:700">02:18 <span style="color:var(--muted);font-weight:500">/ 06:33</span></div><div class="prog"><b></b><u></u></div></div></div>'+
+'<div class="cols"><div class="card"><h2>Расшифровка</h2>'+msg('02:08','Клиент','Когда я получу ответ по обращению?')+msg('02:18','Оператор','Я передам вопрос специалистам.',1,1)+msg('02:27','Клиент','А сколько времени это займёт?')+msg('02:43','Оператор','Обычно специалисты отвечают в течение нескольких рабочих дней.',1)+'</div>'+
+'<div class="card"><h2>Оценка качества</h2><div class="hero">'+ring(85.5,'из 100')+'<div style="position:relative;z-index:1"><h3>Хороший результат</h3><p>Грубых ошибок нет<br>4 критерия выполнены полностью</p></div></div><div style="margin-top:7px">'+crit('✓','g','Консультация','15',20,'linear-gradient(90deg,#2FD6B4,#3DEB8F)')+crit('~','a','Ведение диалога','10,5',15,'linear-gradient(90deg,#F0902B,#FFD978)')+crit('✕','r','Завершение','0',5,'#FF5470')+'</div><div class="why"><b>Почему снижена оценка.</b> Срок ответа не уточнён.</div><div class="acts"><div class="btn go">Перейти к фрагменту</div><div class="btn dis">Оспорить оценку</div></div></div></div>'},
+dialogs:function(){var R=[['warn','r','p1-en-003','Чат','EN','<span class="tag x">Грубая ошибка</span>',38.75,'#FF5470','—','alert'],['chat','a','p1-ru-004','Чат','RU','<span class="tag w">Спорная оценка</span>',45.5,'#FFC24B','1 открыта',''],['chat','a','p1-en-005','Чат','EN','<span class="tag w">Нужна проверка</span>',null,'','—',''],['phone','b','Звонок 024','Звонок','RU','<span class="tag">Оценён</span>',85.5,'#3DEB8F','—',''],['chat','g','p1-ru-001','Чат','RU','<span class="tag">Оценён</span>',86.67,'#3DEB8F','—',''],['chat','g','p1-kz-002','Чат','KZ','<span class="tag">Оценён</span>',100,'#3DEB8F','—','']];
+return '<div class="top"><h1>Диалоги</h1><div style="display:flex;gap:9px"><div class="pill">Набор DEV</div><div class="pill grad">+ Загрузить набор</div></div></div>'+
+'<div class="banner"><div><h2>3 диалога ждут проверки</h2><div>Нарушения и спорные оценки показаны первыми</div><span class="cta">Оценить всё</span></div>'+art+'</div>'+
+'<div class="tiles"><div class="card st"><span class="tile3d g">'+svg(I.chat)+'</span><div><b>65</b><span>Диалогов</span></div></div><div class="card st"><span class="tile3d t">'+svg(I.star)+'</span><div><b>78,4</b><span>Средний балл</span></div></div><div class="card st"><span class="tile3d r">'+svg(I.warn)+'</span><div><b>3</b><span>Грубые ошибки</span></div></div><div class="card st"><span class="tile3d p">'+svg(I.law)+'</span><div><b>1</b><span>Апелляция</span></div></div></div>'+
+'<div class="card" style="flex:1;padding-block:14px"><div class="bar"><span class="f">Все каналы ⌄</span><span class="f">Все языки ⌄</span><span class="f">Все статусы ⌄</span><span class="f">Качество чатов · версия 1 ⌄</span></div><div class="row head"><div></div><div>Диалог</div><div>Язык</div><div>Канал</div><div>Статус</div><div>Итог</div><div>Апелляция</div></div>'+
+R.map(function(r){return '<div class="row '+r[9]+'" onclick="location.hash=\'analysis\'"><span class="tile3d '+r[1]+'">'+svg(I[r[0]])+'</span><div style="font-weight:700">'+r[2]+'</div><div>'+r[4]+'</div><div>'+r[3]+'</div><div>'+r[5]+'</div><div class="sc">'+(r[6]===null?'—':String(r[6]).replace('.',',')+'<i><u style="width:'+r[6]+'%;background:'+r[7]+'"></u></i>')+'</div><div>'+r[8]+'</div></div>'}).join('')+'</div>'},
+appeals:function(){function it(c,ic,n,sub,tag,on){return '<div class="item '+(on?'on':'')+'"><span class="tile3d '+c+'">'+svg(I[ic])+'</span><div><b>'+n+'</b><small>'+sub+'</small>'+tag+'</div></div>'}
+return '<div class="top"><div><h1>Апелляции</h1><div class="chips"><span class="chip">Спорные оценки и решения проверяющего</span></div></div><div class="pill grad">1 открыта</div></div><div class="ap"><div class="card"><h2>Очередь</h2>'+it('p','law','Завершение','Звонок 024','<span class="tag w">Открыта</span>',1)+it('g','check','Консультация','p1-ru-001','<span class="tag">Изменена</span>')+it('t','check','Идентификация','p1-ru-004','<span class="tag">Подтверждена</span>')+'</div>'+
+'<div class="card"><h2>Завершение · Звонок 024</h2><div class="flow"><div class="fbox"><span>Сейчас: оценка ИИ «Нет»</span><b>85,5</b></div><div style="text-align:center;font-size:22px;color:var(--green)">→</div><div class="fbox new"><span style="color:#fff">Если изменить на «Да»</span><b>90,5</b></div></div><div class="cmt"><b>Комментарий оператора.</b> Я предложил обратиться снова и попрощался, но связь оборвалась.</div>'+msg('06:12','Клиент','Понял, спасибо.')+msg('06:28','Оператор','Если что, обращайтесь снова. Всего доброго!',1,1)+
+'<div class="seg"><b>Подтвердить</b><b class="on">Изменить</b></div><div class="ta">Причина решения (обязательно)</div><div class="acts" style="max-width:260px"><div class="btn go">Сохранить решение</div></div></div></div>'},
+checklists:function(){var C=[['Установление контакта','Да / Нет','10','нет','g'],['Выявление потребности','Да / Нет','15','да','g'],['Идентификация','Да / Нет','20','да','t'],['Корректная и полная консультация','Шкала 0–20','20','да','t'],['Эмпатия и клиентоориентированность','Да / Нет','15','нет','p'],['Управление диалогом, скорость и грамотность','Шкала 0–10','15','нет','p'],['Завершение','Да / Нет','5','да','p'],['Грубые ошибки','Флаг','—','нет','r']];
+return '<div class="top"><div><h1>Чек-листы</h1><div class="chips"><span class="chip">Каждое сохранение создаёт новую версию</span></div></div><div style="display:flex;gap:9px"><div class="pill">+ Критерий</div><div class="pill grad">Сохранить</div></div></div><div class="cl"><div class="card"><h2>Чек-листы</h2><div class="item on" style="display:block"><b>Качество чатов</b><small>Версия 1 · 8 критериев</small></div><div class="f" style="text-align:center;margin-top:8px">+ Новый чек-лист</div><h2 style="margin-top:20px">История версий</h2><div class="tag">Версия 1 · текущая</div></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><h2 style="margin:0">Критерии</h2><span class="tag">Сумма весов: 100 ✓</span></div><div class="cr head"><div></div><div>Критерий</div><div>Тип</div><div>Вес</div><div>N/A</div></div>'+
+C.map(function(c,i){return '<div class="cr '+(i===3?'open':'')+'"><span class="tile3d '+c[4]+'">'+(i+1)+'</span><div style="font-weight:700">'+c[0]+'</div><div>'+c[1]+'</div><div style="font-weight:800">'+c[2]+'</div><div>'+c[3]+'</div></div>'+(i===3?'<div class="steps"><span>20</span><span>15</span><span>10</span><span>5</span><span>0</span></div>':'')}).join('')+'</div></div>'},
+analytics:function(){function bg(n,v,c){return '<div class="bg"><span>'+n+'</span><div class="line"><i style="width:'+v+'%;background:'+c+'"></i></div><b>'+v+'%</b></div>'}
+var hot='linear-gradient(90deg,#FF5470,#FF8A5B)',mid='linear-gradient(90deg,#F0902B,#FFD978)',ok='linear-gradient(90deg,#2FD6B4,#3DEB8F)';
+return '<div class="top"><div><h1>Аналитика</h1><div class="chips"><span class="chip">Набор DEV</span><span class="chip">Качество чатов · версия 1</span></div></div></div>'+
+'<div class="banner" style="padding-block:18px"><div style="display:flex;align-items:center;gap:22px">'+ring(78.4,'средний')+'<div><h2>Чаще всего теряем баллы на завершении</h2><div>Здесь видно, где менять инструкции, обучение и продукт</div></div></div></div>'+
+'<div class="an"><div class="card"><h2>Самые слабые критерии</h2>'+bg('Завершение',42,hot)+bg('Идентификация',58,hot)+bg('Выявление потребности',67,mid)+bg('Консультация',71,mid)+bg('Ведение диалога',79,ok)+bg('Эмпатия',88,ok)+bg('Установление контакта',91,ok)+'</div><div style="display:flex;flex-direction:column;gap:14px"><div class="card"><h2>Средний балл по языкам</h2><div class="lang"><div class="g"><b>80,1</b><span>Русский</span></div><div class="t"><b>74,6</b><span>Казахский</span></div><div class="p"><b>77,3</b><span>Английский</span></div></div></div><div class="card" style="flex:1"><h2>Риски и апелляции</h2><div class="tiles" style="grid-template-columns:1fr 1fr"><div class="st" style="padding:0"><span class="tile3d r">'+svg(I.warn)+'</span><div><b>3</b><span>Грубые ошибки</span></div></div><div class="st" style="padding:0"><span class="tile3d p">'+svg(I.law)+'</span><div><b>4</b><span>Апелляции</span></div></div><div class="st" style="padding:0"><span class="tile3d a">'+svg(I.chat)+'</span><div><b>2</b><span>Нужна проверка</span></div></div><div class="st" style="padding:0"><span class="tile3d g">'+svg(I.check)+'</span><div><b>1</b><span>Оценка изменена</span></div></div></div></div></div></div>'}
+};
+document.getElementById('m').innerHTML=V[s]();
+window.addEventListener('hashchange',function(){location.reload()});
+</script></body></html>
